@@ -1,4 +1,5 @@
 import { ArrowRight, Clock3 } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,7 +47,11 @@ export function CourseCard({ course, index }: CourseCardProps) {
           <Badge variant="secondary">{course.category}</Badge>
           <Badge variant="outline">{course.level}</Badge>
         </div>
-        <h3 className="text-lg font-semibold tracking-tight">{course.title}</h3>
+        <h3 className="text-lg font-semibold tracking-tight">
+          <Link href={`/details/${course.id}`} className="rounded-sm outline-none transition-colors hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-ring dark:hover:text-emerald-400" aria-label={`View ${course.title} course details`}>
+            {course.title}
+          </Link>
+        </h3>
       </CardHeader>
       <CardContent className="flex-1 px-5 pb-5">
         <p className="text-sm leading-6 text-muted-foreground">{course.description}</p>
@@ -55,9 +60,12 @@ export function CourseCard({ course, index }: CourseCardProps) {
         <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <Clock3 className="size-3.5" aria-hidden="true" /> {course.duration}
         </span>
-        <Button type="button" size="sm" className="rounded-full px-4">
-          Enroll Now <ArrowRight className="size-3.5" aria-hidden="true" />
-        </Button>
+        <div className="flex items-center gap-3">
+          <Link href={`/details/${course.id}`} className="text-xs font-semibold text-emerald-700 hover:underline dark:text-emerald-400">Details</Link>
+          <Button type="button" size="sm" className="rounded-full px-4">
+            Enroll Now <ArrowRight className="size-3.5" aria-hidden="true" />
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

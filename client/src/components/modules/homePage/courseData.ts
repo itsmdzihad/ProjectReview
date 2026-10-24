@@ -11,6 +11,7 @@ import type { Course, LearningStep } from "./types";
 
 export const courses: Course[] = [
   {
+    id: "html-css",
     title: "Web Design with HTML & CSS",
     description: "Build your first polished web pages from the ground up.",
     category: "HTML & CSS",
@@ -22,6 +23,7 @@ export const courses: Course[] = [
     code: ["<main>", "  <h1>Hello, world</h1>", "</main>"],
   },
   {
+    id: "javascript-fundamentals",
     title: "JavaScript Fundamentals",
     description: "Learn the language of the web through practical examples.",
     category: "JavaScript",
@@ -33,6 +35,7 @@ export const courses: Course[] = [
     code: ["const make = (thing) => {", "  return `Build ${thing}`", "}"],
   },
   {
+    id: "responsive-web-design",
     title: "Responsive Web Design",
     description: "Create experiences that feel at home on every screen.",
     category: "CSS",
@@ -44,6 +47,7 @@ export const courses: Course[] = [
     code: [".layout {", "  display: grid;", "  gap: 1.5rem;", "}"],
   },
   {
+    id: "typescript-essentials",
     title: "TypeScript Essentials",
     description: "Write clearer, safer JavaScript with a powerful type system.",
     category: "TypeScript",
@@ -55,6 +59,7 @@ export const courses: Course[] = [
     code: ["type Learner = {", "  curious: true", "  builds: Project[]", "}"],
   },
   {
+    id: "react-fundamentals",
     title: "React Fundamentals",
     description: "Turn ideas into interactive interfaces with reusable UI.",
     category: "React",
@@ -66,6 +71,7 @@ export const courses: Course[] = [
     code: ["function Welcome() {", "  return <h1>Hey!</h1>", "}"],
   },
   {
+    id: "git-github-basics",
     title: "Git & GitHub Basics",
     description: "Track your work and collaborate with confidence.",
     category: "Git",

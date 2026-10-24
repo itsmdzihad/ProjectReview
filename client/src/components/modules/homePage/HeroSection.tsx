@@ -3,7 +3,6 @@ import {
   ArrowUpRight,
   Code2,
   Play,
-  Sparkles,
   Terminal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,9 +11,6 @@ export function HeroSection() {
   return (
     <section className="mx-auto grid max-w-7xl items-center gap-10 px-5 pt-12 pb-16 sm:px-8 sm:pt-16 lg:grid-cols-[1fr_0.88fr] lg:gap-14 lg:px-10 lg:pt-20 lg:pb-20">
       <div className="max-w-2xl">
-        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-300">
-          <Sparkles className="size-3.5" aria-hidden="true" /> Learn by building
-        </div>
         <h1 className="text-4xl leading-[1.1] font-semibold tracking-[-0.045em] text-foreground sm:text-5xl lg:text-[3.75rem]">
           Learn web development. <span className="text-emerald-700 dark:text-emerald-400">Build real projects.</span>
         </h1>
@@ -22,10 +18,10 @@ export function HeroSection() {
           Practical programming courses, clear explanations, and hands-on projects to help you turn curiosity into a skill.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-3">
-          <Button render={<a href="#courses" />} size="lg" className="rounded-full bg-emerald-700 px-6 text-white hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500">
+          <Button nativeButton={false} render={<a href="#courses" />} size="lg" className="rounded-full bg-emerald-700 px-6 text-white hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500">
             Explore courses <ArrowRight className="size-4" aria-hidden="true" />
           </Button>
-          <Button render={<a href="#how-it-works" />} variant="outline" size="lg" className="rounded-full px-5">
+          <Button nativeButton={false} render={<a href="#how-it-works" />} variant="outline" size="lg" className="rounded-full px-5">
             <Play className="size-3.5" aria-hidden="true" /> How it works
           </Button>
         </div>

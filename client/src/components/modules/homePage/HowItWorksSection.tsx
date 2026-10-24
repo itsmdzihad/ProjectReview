@@ -27,7 +27,7 @@ export function HowItWorksSection() {
           <h3 className="text-lg font-semibold">Ready to write your first line?</h3>
           <p className="mt-1 text-sm text-emerald-100/80">Pick a course and make today your starting point.</p>
         </div>
-        <Button render={<a href="#courses" />} variant="secondary" className="rounded-full bg-white px-5 text-emerald-950 hover:bg-emerald-50">
+        <Button nativeButton={false} render={<a href="#courses" />} variant="secondary" className="rounded-full bg-white px-5 text-emerald-950 hover:bg-emerald-50">
           Find your course <ArrowRight className="size-4" aria-hidden="true" />
         </Button>
       </div>

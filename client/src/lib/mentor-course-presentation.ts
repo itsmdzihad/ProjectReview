@@ -9,6 +9,7 @@ export function toCourseCardData(course: MentorCourse): Course {
     title: course.title,
     description: course.description,
     category: course.category,
+    coverImageUrl: course.coverImageUrl,
     level: course.level,
     duration: course.duration,
     icon: Code2,

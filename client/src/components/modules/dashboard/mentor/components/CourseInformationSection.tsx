@@ -16,6 +16,7 @@ export function CourseInformationSection() {
       <div className="grid gap-5 sm:grid-cols-2">
         <CourseInputField label="Course title" name="title" placeholder="e.g. UI Design Fundamentals" required />
         <CourseInputField label="Category" name="category" placeholder="e.g. Design" required />
+        <CourseInputField label="Cover image URL" name="coverImageUrl" type="url" placeholder="https://images.example.com/course-cover.jpg" required />
         <CourseLevelField />
         <CourseInputField label="Duration" name="duration" placeholder="e.g. 4 weeks" required />
         <CourseTextareaField label="Course description" name="description" placeholder="What will students learn in this course?" required className="sm:col-span-2" />

@@ -6,10 +6,10 @@ import type { MentorCourse, NewMentorCourse } from "@/types/mentorCourse";
 export const MENTOR_COURSES_STORAGE_KEY = "codepath:mentor:courses";
 export const MENTOR_COURSES_CHANGE_EVENT = "codepath:mentor-courses-changed";
 
-function isMentorCourse(value: unknown): value is MentorCourse {
-  if (!value || typeof value !== "object") return false;
+function normalizeMentorCourse(value: unknown): MentorCourse | null {
+  if (!value || typeof value !== "object") return null;
   const course = value as Partial<MentorCourse>;
-  return (
+  const isValid = (
     typeof course.id === "string" &&
     typeof course.title === "string" &&
     typeof course.description === "string" &&
@@ -23,13 +23,21 @@ function isMentorCourse(value: unknown): value is MentorCourse {
     typeof course.projectDeliverable === "string" &&
     typeof course.createdAt === "string"
   );
+  if (!isValid) return null;
+
+  return {
+    ...course,
+    coverImageUrl: typeof course.coverImageUrl === "string" ? course.coverImageUrl : "",
+  } as MentorCourse;
 }
 
 function readCourses() {
   try {
     const stored = window.localStorage.getItem(MENTOR_COURSES_STORAGE_KEY);
     const parsed: unknown = stored ? JSON.parse(stored) : [];
-    return Array.isArray(parsed) ? parsed.filter(isMentorCourse) : [];
+    return Array.isArray(parsed)
+      ? parsed.map(normalizeMentorCourse).filter((course): course is MentorCourse => course !== null)
+      : [];
   } catch {
     return [];
   }

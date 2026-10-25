@@ -1,4 +1,4 @@
-import { StudentProjectSubmissionCard } from "./StudentProjectSubmissionCard";
+import { ProjectSubmissionTable } from "./ProjectSubmissionTable";
 import type { StudentProjectSubmission } from "@/lib/project-submissions";
 
 export function ProjectSubmissionList({
@@ -25,14 +25,7 @@ export function ProjectSubmissionList({
           {submissions.length} submissions
         </span>
       </div>
-      <div className="grid gap-4">
-        {sortedSubmissions.map((submission) => (
-          <StudentProjectSubmissionCard
-            key={`${submission.studentId}-${submission.submittedAt}`}
-            submission={submission}
-          />
-        ))}
-      </div>
+      <ProjectSubmissionTable submissions={sortedSubmissions} />
     </section>
   );
 }

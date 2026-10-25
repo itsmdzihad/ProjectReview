@@ -26,6 +26,7 @@ export function CreateMentorCourseForm() {
       title: String(formData.get("title") ?? "").trim(),
       description: String(formData.get("description") ?? "").trim(),
       category: String(formData.get("category") ?? "").trim(),
+      coverImageUrl: String(formData.get("coverImageUrl") ?? "").trim(),
       level: String(formData.get("level")) === "Intermediate" ? "Intermediate" : "Beginner",
       duration: String(formData.get("duration") ?? "").trim(),
       articles,

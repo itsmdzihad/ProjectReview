@@ -7,6 +7,7 @@ export type Course = {
   category: string;
   level: "Beginner" | "Intermediate";
   duration: string;
+  coverImageUrl?: string;
   icon: LucideIcon;
   accent: string;
   graphic: string;

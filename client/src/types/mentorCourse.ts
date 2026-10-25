@@ -3,6 +3,7 @@ export type MentorCourse = {
   title: string;
   description: string;
   category: string;
+  coverImageUrl: string;
   level: "Beginner" | "Intermediate";
   duration: string;
   articles: string[];

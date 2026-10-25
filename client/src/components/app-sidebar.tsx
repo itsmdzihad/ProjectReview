@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpenCheck, Code2 } from "lucide-react";
+import { Code2 } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import {
@@ -41,8 +41,12 @@ export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
                 <Code2 className="size-4" aria-hidden="true" />
               </span>
               <span className="grid text-left leading-tight">
-                <span className="text-sm font-semibold tracking-tight">CodePath</span>
-                <span className="text-[11px] text-muted-foreground">{isStudent ? "Student" : "Mentor"} workspace</span>
+                <span className="text-sm font-semibold tracking-tight">
+                  CodePath
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  {isStudent ? "Student" : "Mentor"} workspace
+                </span>
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -50,12 +54,6 @@ export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
       </SidebarHeader>
       <SidebarContent className="gap-1 py-3">
         <NavMain routes={routes} />
-        <div className="mt-auto mx-3 mb-2 flex items-center gap-2 rounded-xl border border-sidebar-border/70 bg-sidebar-accent/40 px-3 py-3 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-            <BookOpenCheck className="size-3.5" aria-hidden="true" />
-          </span>
-          <span className="leading-5">Learn a little. Build a lot.</span>
-        </div>
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border/70 p-2">
         <NavUser user={user} />

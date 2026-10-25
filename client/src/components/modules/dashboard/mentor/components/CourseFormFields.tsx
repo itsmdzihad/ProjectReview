@@ -7,13 +7,14 @@ type FieldProps = {
   placeholder: string;
   required?: boolean;
   className?: string;
+  type?: "text" | "url";
 };
 
-export function CourseInputField({ label, name, placeholder, required, className }: FieldProps) {
+export function CourseInputField({ label, name, placeholder, required, className, type = "text" }: FieldProps) {
   return (
     <div className={`space-y-2 ${className ?? ""}`}>
       <Label htmlFor={name}>{label}</Label>
-      <Input id={name} name={name} placeholder={placeholder} required={required} />
+      <Input id={name} name={name} type={type} placeholder={placeholder} required={required} />
     </div>
   );
 }

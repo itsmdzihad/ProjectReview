@@ -5,6 +5,7 @@ import { useMentorCourses } from "@/hooks/use-mentor-courses";
 import { useMentorProjectSubmissions } from "@/hooks/use-mentor-project-submissions";
 import { CourseSubmissionSelector } from "./components/CourseSubmissionSelector";
 import { ProjectSubmissionList } from "./components/ProjectSubmissionList";
+import { SampleProjectSubmissions } from "./components/SampleProjectSubmissions";
 import { SubmissionEmptyState } from "./components/SubmissionEmptyState";
 
 export function MentorProjectSubmissions() {
@@ -28,8 +29,16 @@ export function MentorProjectSubmissions() {
       />
       {isLoading ? (
         <SubmissionListPlaceholder />
-      ) : !selectedCourse || submissions.length === 0 ? (
-        <SubmissionEmptyState courseTitle={selectedCourse?.title} />
+      ) : !selectedCourse ? (
+        <div className="space-y-6">
+          <SubmissionEmptyState />
+          <SampleProjectSubmissions courseTitle="an example course" />
+        </div>
+      ) : submissions.length === 0 ? (
+        <div className="space-y-6">
+          <SubmissionEmptyState courseTitle={selectedCourse.title} />
+          <SampleProjectSubmissions courseTitle={selectedCourse.title} />
+        </div>
       ) : (
         <ProjectSubmissionList courseTitle={selectedCourse.title} submissions={submissions} />
       )}

@@ -10,9 +10,14 @@ export const studentRoutes: Route[] = [
         url: "/student/dashboard",
         icon: LayoutDashboard,
       },
+    ],
+  },
+  {
+    title: "Course",
+    items: [
       {
-        title: "Browse courses",
-        url: "/#courses",
+        title: "Enroll Course List",
+        url: "/student/courses/enroll",
         icon: BookOpenText,
       },
     ],

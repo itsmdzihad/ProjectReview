@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowUpRight } from "lucide-react";
 import { courses } from "./courseData";
 import { CourseCard } from "./CourseCard";

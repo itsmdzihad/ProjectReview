@@ -1,5 +1,5 @@
-const StudentDashboard = () => {
-  return <div>Hi this is from student dashboard</div>;
-};
+import { StudentDashboard } from "@/components/modules/dashboard/student/StudentDashboard";
 
-export default StudentDashboard;
+export default function StudentDashboardPage() {
+  return <StudentDashboard />;
+}

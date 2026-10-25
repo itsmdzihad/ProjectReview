@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowRight, Clock3 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +11,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import type { Course } from "./types";
+import { useStudentEnrollments } from "@/hooks/use-student-enrollments";
 
 type CourseCardProps = {
   course: Course;
@@ -17,6 +20,8 @@ type CourseCardProps = {
 
 export function CourseCard({ course, index }: CourseCardProps) {
   const Icon = course.icon;
+  const { enrollCourse, isEnrolled } = useStudentEnrollments();
+  const enrolled = isEnrolled(course.id);
 
   return (
     <Card className="group h-full gap-0 rounded-2xl border border-border/70 bg-card p-0 shadow-none transition duration-200 hover:-translate-y-1 hover:border-foreground/15 hover:shadow-lg hover:shadow-foreground/5">
@@ -62,9 +67,23 @@ export function CourseCard({ course, index }: CourseCardProps) {
         </span>
         <div className="flex items-center gap-3">
           <Link href={`/details/${course.id}`} className="text-xs font-semibold text-emerald-700 hover:underline dark:text-emerald-400">Details</Link>
-          <Button type="button" size="sm" className="rounded-full px-4">
-            Enroll Now <ArrowRight className="size-3.5" aria-hidden="true" />
-          </Button>
+          {enrolled ? (
+            <Link
+              href={`/details/${course.id}`}
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-full bg-emerald-700 px-4 text-xs font-medium text-white transition-colors hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+            >
+              Continue <ArrowRight className="size-3.5" aria-hidden="true" />
+            </Link>
+          ) : (
+            <Button
+              type="button"
+              size="sm"
+              className="rounded-full bg-emerald-700 px-4 text-white hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+              onClick={() => enrollCourse(course.id)}
+            >
+              Enroll Now <ArrowRight className="size-3.5" aria-hidden="true" />
+            </Button>
+          )}
         </div>
       </CardFooter>
     </Card>

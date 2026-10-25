@@ -69,7 +69,7 @@ export function CourseCard({ course, index }: CourseCardProps) {
           <Link href={`/details/${course.id}`} className="text-xs font-semibold text-emerald-700 hover:underline dark:text-emerald-400">Details</Link>
           {enrolled ? (
             <Link
-              href={`/details/${course.id}`}
+              href={`/student/courses/enroll/${course.id}`}
               className="inline-flex h-8 items-center justify-center gap-1.5 rounded-full bg-emerald-700 px-4 text-xs font-medium text-white transition-colors hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500"
             >
               Continue <ArrowRight className="size-3.5" aria-hidden="true" />

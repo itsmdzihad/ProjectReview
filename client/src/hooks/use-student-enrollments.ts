@@ -28,10 +28,12 @@ function saveEnrollments(courseIds: string[]) {
 
 export function useStudentEnrollments() {
   const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const syncEnrollments = () => setEnrolledCourseIds(readEnrollments());
     syncEnrollments();
+    setIsReady(true);
     window.addEventListener(CHANGE_EVENT, syncEnrollments);
     window.addEventListener("storage", syncEnrollments);
 
@@ -52,5 +54,5 @@ export function useStudentEnrollments() {
     [enrolledCourseIds],
   );
 
-  return { enrolledCourseIds, enrollCourse, isEnrolled };
+  return { enrolledCourseIds, enrollCourse, isEnrolled, isReady };
 }

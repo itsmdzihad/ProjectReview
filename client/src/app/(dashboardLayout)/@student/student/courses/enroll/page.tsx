@@ -1,6 +1,6 @@
 import { ArrowLeft, BookOpenText } from "lucide-react";
 import Link from "next/link";
-import { EnrolledCourseCatalog } from "@/components/modules/dashboard/student/EnrolledCourseCatalog";
+import { EnrolledCourseCatalog } from "@/components/modules/dashboard/student/components/EnrolledCourseCatalog";
 
 export default function EnrollCourseListPage() {
   return (

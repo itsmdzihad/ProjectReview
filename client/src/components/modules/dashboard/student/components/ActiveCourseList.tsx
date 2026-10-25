@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowRight, BookOpenText } from "lucide-react";
 import { courses } from "@/components/modules/homePage/courseData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useMentorCourses } from "@/hooks/use-mentor-courses";
+import { toCourseCardData } from "@/lib/mentor-course-presentation";
 
 const courseProgress: Record<string, number> = {
   "javascript-fundamentals": 68,
@@ -13,7 +15,12 @@ const courseProgress: Record<string, number> = {
 };
 
 export function ActiveCourseList({ enrolledCourseIds }: { enrolledCourseIds: string[] }) {
-  const activeCourses = courses.filter((course) => enrolledCourseIds.includes(course.id));
+  const { mentorCourses } = useMentorCourses();
+  const availableCourses = [
+    ...courses,
+    ...mentorCourses.map(toCourseCardData),
+  ];
+  const activeCourses = availableCourses.filter((course) => enrolledCourseIds.includes(course.id));
 
   return (
     <Card className="rounded-2xl border-border/70 shadow-none">

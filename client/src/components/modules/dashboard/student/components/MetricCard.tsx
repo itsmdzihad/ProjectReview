@@ -17,14 +17,10 @@ export function MetricCard({ metric }: { metric: DashboardMetric }) {
       <CardContent className="flex items-start justify-between gap-4 p-5">
         <div>
           <p className="text-sm text-muted-foreground">{metric.label}</p>
-          <p className="mt-2 text-3xl font-semibold tracking-tight">
-            {metric.value}
-          </p>
+          <p className="mt-2 text-3xl font-semibold tracking-tight tabular-nums">{metric.value}</p>
           <p className="mt-2 text-xs text-muted-foreground">{metric.note}</p>
         </div>
-        <div
-          className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${metric.tint}`}
-        >
+        <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${metric.tint}`}>
           <Icon className="size-5" aria-hidden="true" />
         </div>
       </CardContent>

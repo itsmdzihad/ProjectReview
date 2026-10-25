@@ -1,29 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import {
+  DEMO_STUDENT,
+  PROJECT_SUBMISSIONS_CHANGE_EVENT,
+  readProjectSubmissions,
+  writeProjectSubmissions,
+  type ProjectSubmissionDetails,
+  type StudentProjectSubmission,
+} from "@/lib/project-submissions";
 
-const STORAGE_KEY = "codepath:student:project-submissions";
-const CHANGE_EVENT = "codepath:student-project-submissions-changed";
-
-export type StudentProjectSubmission = {
-  projectName: string;
-  repoUrl: string;
-  liveLink: string;
-  description: string;
-  submittedAt: string;
-};
-
-function readSubmissions() {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    const parsed: unknown = stored ? JSON.parse(stored) : {};
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
-      ? (parsed as Record<string, StudentProjectSubmission>)
-      : {};
-  } catch {
-    return {};
-  }
-}
+export type { StudentProjectSubmission } from "@/lib/project-submissions";
 
 export function useStudentProjectSubmission(courseId: string) {
   const [submission, setSubmission] = useState<StudentProjectSubmission | null>(null);
@@ -31,32 +18,36 @@ export function useStudentProjectSubmission(courseId: string) {
 
   useEffect(() => {
     const syncSubmission = () => {
-      setSubmission(readSubmissions()[courseId] ?? null);
+      const courseSubmissions = readProjectSubmissions()[courseId] ?? [];
+      setSubmission(courseSubmissions.find((item) => item.studentId === DEMO_STUDENT.id) ?? null);
+      setIsReady(true);
     };
 
     syncSubmission();
-    setIsReady(true);
-    window.addEventListener(CHANGE_EVENT, syncSubmission);
+    window.addEventListener(PROJECT_SUBMISSIONS_CHANGE_EVENT, syncSubmission);
     window.addEventListener("storage", syncSubmission);
 
     return () => {
-      window.removeEventListener(CHANGE_EVENT, syncSubmission);
+      window.removeEventListener(PROJECT_SUBMISSIONS_CHANGE_EVENT, syncSubmission);
       window.removeEventListener("storage", syncSubmission);
     };
   }, [courseId]);
 
-  const saveSubmission = useCallback((details: Omit<StudentProjectSubmission, "submittedAt">) => {
-    const nextSubmission = { ...details, submittedAt: new Date().toISOString() };
-    const submissions = readSubmissions();
-    submissions[courseId] = nextSubmission;
-
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
-      window.dispatchEvent(new Event(CHANGE_EVENT));
-    } catch {
-      // Keep the current page usable when browser storage is unavailable.
-    }
-
+  const saveSubmission = useCallback((details: ProjectSubmissionDetails) => {
+    const nextSubmission: StudentProjectSubmission = {
+      ...details,
+      studentId: DEMO_STUDENT.id,
+      studentName: DEMO_STUDENT.name,
+      studentEmail: DEMO_STUDENT.email,
+      submittedAt: new Date().toISOString(),
+    };
+    const submissions = readProjectSubmissions();
+    const courseSubmissions = submissions[courseId] ?? [];
+    submissions[courseId] = [
+      ...courseSubmissions.filter((item) => item.studentId !== DEMO_STUDENT.id),
+      nextSubmission,
+    ];
+    writeProjectSubmissions(submissions);
     setSubmission(nextSubmission);
   }, [courseId]);
 

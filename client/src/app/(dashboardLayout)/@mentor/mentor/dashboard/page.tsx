@@ -1,9 +1,5 @@
-const MentorDashboard = () => {
-  return (
-    <div>
-      <h1>hi this is from mentor</h1>
-    </div>
-  );
-};
+import { MentorDashboard } from "@/components/modules/dashboard/mentor/MentorDashboard";
 
-export default MentorDashboard;
+export default function MentorDashboardPage() {
+  return <MentorDashboard />;
+}

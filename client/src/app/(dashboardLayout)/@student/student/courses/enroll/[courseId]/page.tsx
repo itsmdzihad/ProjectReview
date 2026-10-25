@@ -1,7 +1,5 @@
 import { Suspense } from "react";
-import { notFound } from "next/navigation";
 import { CourseLearningPage } from "@/components/modules/dashboard/student/CourseLearningPage";
-import { courseContent } from "@/components/modules/courseDetails/courseContent";
 import { courses } from "@/components/modules/homePage/courseData";
 
 export function generateStaticParams() {
@@ -30,9 +28,5 @@ export default function CourseLearningRoute({ params }: CourseLearningRouteProps
 
 async function CourseLearningRouteContent({ params }: CourseLearningRouteProps) {
   const { courseId } = await params;
-  const hasCourse = courses.some((course) => course.id === courseId);
-
-  if (!hasCourse || !courseContent[courseId]) notFound();
-
   return <CourseLearningPage courseId={courseId} />;
 }

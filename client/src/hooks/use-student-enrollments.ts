@@ -31,9 +31,11 @@ export function useStudentEnrollments() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const syncEnrollments = () => setEnrolledCourseIds(readEnrollments());
+    const syncEnrollments = () => {
+      setEnrolledCourseIds(readEnrollments());
+      setIsReady(true);
+    };
     syncEnrollments();
-    setIsReady(true);
     window.addEventListener(CHANGE_EVENT, syncEnrollments);
     window.addEventListener("storage", syncEnrollments);
 

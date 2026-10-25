@@ -1,4 +1,4 @@
-import { BookOpenText, LayoutDashboard } from "lucide-react";
+import { ClipboardList, LayoutDashboard, PlusCircle } from "lucide-react";
 import type { Route } from "@/types";
 
 export const mentorRoutes: Route[] = [
@@ -10,10 +10,20 @@ export const mentorRoutes: Route[] = [
         url: "/mentor/dashboard",
         icon: LayoutDashboard,
       },
+    ],
+  },
+  {
+    title: "Courses",
+    items: [
       {
-        title: "Course library",
-        url: "/#courses",
-        icon: BookOpenText,
+        title: "Create Course",
+        url: "/mentor/courses/create",
+        icon: PlusCircle,
+      },
+      {
+        title: "Project Submissions",
+        url: "/mentor/project-submissions",
+        icon: ClipboardList,
       },
     ],
   },

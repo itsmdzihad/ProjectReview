@@ -16,9 +16,10 @@ import { useStudentEnrollments } from "@/hooks/use-student-enrollments";
 type CourseCardProps = {
   course: Course;
   index: number;
+  detailsHref?: string;
 };
 
-export function CourseCard({ course, index }: CourseCardProps) {
+export function CourseCard({ course, index, detailsHref = `/details/${course.id}` }: CourseCardProps) {
   const Icon = course.icon;
   const { enrollCourse, isEnrolled } = useStudentEnrollments();
   const enrolled = isEnrolled(course.id);
@@ -53,7 +54,7 @@ export function CourseCard({ course, index }: CourseCardProps) {
           <Badge variant="outline">{course.level}</Badge>
         </div>
         <h3 className="text-lg font-semibold tracking-tight">
-          <Link href={`/details/${course.id}`} className="rounded-sm outline-none transition-colors hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-ring dark:hover:text-emerald-400" aria-label={`View ${course.title} course details`}>
+          <Link href={detailsHref} className="rounded-sm outline-none transition-colors hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-ring dark:hover:text-emerald-400" aria-label={`View ${course.title} course details`}>
             {course.title}
           </Link>
         </h3>
@@ -66,7 +67,7 @@ export function CourseCard({ course, index }: CourseCardProps) {
           <Clock3 className="size-3.5" aria-hidden="true" /> {course.duration}
         </span>
         <div className="flex items-center gap-3">
-          <Link href={`/details/${course.id}`} className="text-xs font-semibold text-emerald-700 hover:underline dark:text-emerald-400">Details</Link>
+          <Link href={detailsHref} className="text-xs font-semibold text-emerald-700 hover:underline dark:text-emerald-400">Details</Link>
           {enrolled ? (
             <Link
               href={`/student/courses/enroll/${course.id}`}

@@ -5,9 +5,10 @@ import { CheckCircle2, ExternalLink, Pencil, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { StudentProjectSubmission } from "@/hooks/use-student-project-submission";
+import type { StudentProjectSubmission } from "@/lib/project-submissions";
+import type { ProjectSubmissionDetails } from "@/lib/project-submissions";
 
-type SubmissionFields = Omit<StudentProjectSubmission, "submittedAt">;
+type SubmissionFields = ProjectSubmissionDetails;
 
 export function ProjectSubmissionForm({
   submission,

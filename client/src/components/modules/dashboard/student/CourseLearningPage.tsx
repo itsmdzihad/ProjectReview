@@ -5,6 +5,8 @@ import { courseContent } from "@/components/modules/courseDetails/courseContent"
 import { useStudentCourseProgress } from "@/hooks/use-student-course-progress";
 import { useStudentEnrollments } from "@/hooks/use-student-enrollments";
 import { useStudentProjectSubmission } from "@/hooks/use-student-project-submission";
+import { useMentorCourses } from "@/hooks/use-mentor-courses";
+import { toCourseCardData, toCourseContent } from "@/lib/mentor-course-presentation";
 import { CourseCompletionCard } from "./components/CourseCompletionCard";
 import { CourseEnrollmentPrompt } from "./components/CourseEnrollmentPrompt";
 import { CourseLessonCard } from "./components/CourseLessonCard";
@@ -12,8 +14,12 @@ import { CourseProgressHeader } from "./components/CourseProgressHeader";
 import { CourseSectionNavigation } from "./components/CourseSectionNavigation";
 
 export function CourseLearningPage({ courseId }: { courseId: string }) {
-  const course = courses.find((item) => item.id === courseId);
-  const content = courseContent[courseId];
+  const { mentorCourses, isReady: mentorCoursesReady } = useMentorCourses();
+  const mentorCourse = mentorCourses.find((item) => item.id === courseId);
+  const course = courses.find((item) => item.id === courseId)
+    ?? (mentorCourse ? toCourseCardData(mentorCourse) : undefined);
+  const content = courseContent[courseId]
+    ?? (mentorCourse ? toCourseContent(mentorCourse) : undefined);
   const totalSteps = (content?.articles.length ?? 0) + 1;
   const { currentStep, isReady: progressReady, goToStep, nextStep } =
     useStudentCourseProgress(courseId, totalSteps);
@@ -25,7 +31,7 @@ export function CourseLearningPage({ courseId }: { courseId: string }) {
     saveSubmission,
   } = useStudentProjectSubmission(courseId);
 
-  if (!progressReady || !enrollmentsReady || !submissionReady) {
+  if (!progressReady || !enrollmentsReady || !submissionReady || !mentorCoursesReady) {
     return <CourseLearningPlaceholder />;
   }
 

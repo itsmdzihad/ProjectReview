@@ -1,0 +1,33 @@
+import { Code2 } from "lucide-react";
+import type { Course } from "@/components/modules/homePage/types";
+import type { CourseContent } from "@/components/modules/courseDetails/courseContent";
+import type { MentorCourse } from "@/types/mentorCourse";
+
+export function toCourseCardData(course: MentorCourse): Course {
+  return {
+    id: course.id,
+    title: course.title,
+    description: course.description,
+    category: course.category,
+    level: course.level,
+    duration: course.duration,
+    icon: Code2,
+    accent: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
+    graphic: "from-emerald-100/80 to-teal-50 dark:from-emerald-950 dark:to-teal-950",
+    code: [`// ${course.category}`, `// ${course.title}`, "Start building..."],
+  };
+}
+
+export function toCourseContent(course: MentorCourse): CourseContent {
+  return {
+    overview: course.description,
+    outcomes: course.articles.map((article) => `Understand and apply ${article.toLowerCase()}`),
+    articles: course.articles,
+    articleSummaries: course.articles.map(
+      (article) => `${article} introduces an important part of ${course.title}. Read through the main idea, try the examples from your course materials, and consider how it can help you build the final project.`,
+    ),
+    projectTitle: course.projectTitle,
+    projectDescription: course.projectDescription,
+    projectDeliverable: course.projectDeliverable,
+  };
+}

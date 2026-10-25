@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { Course } from "@/components/modules/homePage/types";
 import type { CourseContent } from "@/components/modules/courseDetails/courseContent";
-import type { StudentProjectSubmission } from "@/hooks/use-student-project-submission";
+import type { ProjectSubmissionDetails, StudentProjectSubmission } from "@/lib/project-submissions";
 import { ProjectSubmissionForm } from "./ProjectSubmissionForm";
 
 export function CourseLessonCard({
@@ -29,7 +29,7 @@ export function CourseLessonCard({
   onPrevious: () => void;
   onNext: () => void;
   submission: StudentProjectSubmission | null;
-  onSubmitProject: (details: Omit<StudentProjectSubmission, "submittedAt">) => void;
+  onSubmitProject: (details: ProjectSubmissionDetails) => void;
 }) {
   const title = isProject ? content.projectTitle : content.articles[currentStep];
   const StepIcon = isProject ? FolderKanban : BookOpenText;
@@ -122,7 +122,7 @@ function ProjectLesson({
 }: {
   content: CourseContent;
   submission: StudentProjectSubmission | null;
-  onSubmitProject: (details: Omit<StudentProjectSubmission, "submittedAt">) => void;
+  onSubmitProject: (details: ProjectSubmissionDetails) => void;
 }) {
   return (
     <div className="space-y-6">

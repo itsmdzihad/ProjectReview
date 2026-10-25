@@ -18,7 +18,7 @@ export default function DashboardLayout({
   mentor: React.ReactNode;
   student: React.ReactNode;
 }) {
-  const userRole: DashboardRole = "student";
+  const userRole: DashboardRole = "mentor";
   const activeDashboard = getDashboardForRole(userRole, student, mentor);
 
   return (

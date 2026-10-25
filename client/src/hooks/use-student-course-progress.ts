@@ -34,10 +34,10 @@ export function useStudentCourseProgress(courseId: string, totalSteps: number) {
     const syncProgress = () => {
       const savedStep = readProgress()[courseId] ?? 0;
       setCurrentStep(Math.max(0, Math.min(totalSteps, savedStep)));
+      setIsReady(true);
     };
 
     syncProgress();
-    setIsReady(true);
     window.addEventListener(CHANGE_EVENT, syncProgress);
     window.addEventListener("storage", syncProgress);
 

@@ -23,9 +23,6 @@ connect();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-
-app.use("/api/v1", router);
-
 app.get("/api/v1/health", (req: Request, res: Response, next: NextFunction) => {
   sendRes({
     res,
@@ -34,6 +31,12 @@ app.get("/api/v1/health", (req: Request, res: Response, next: NextFunction) => {
     message: "The Server is Running",
     data: {},
   });
+});
+
+app.use("/api/v1", router);
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  next(new AppError(404, `Route ${req.originalUrl} not found`));
 });
 
 app.use(globalErrorHandler);

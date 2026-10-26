@@ -1,0 +1,15 @@
+model Enrollment {
+    id String @id @default(uuid())
+
+    studentId String
+    courseId  String
+
+    student User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+    course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@unique([studentId, courseId])
+    @@index([courseId])
+    @@map("enrollments")
+}

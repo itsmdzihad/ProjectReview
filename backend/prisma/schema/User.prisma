@@ -1,0 +1,17 @@
+model User {
+    id           String @id @default(uuid())
+    name         String
+    email        String @unique
+    passwordHash String
+    role         Role   @default(STUDENT)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    courses     Course[]     @relation("CourseMentor")
+    enrollments Enrollment[]
+    submissions Submission[]
+
+    @@index([role])
+    @@map("users")
+}

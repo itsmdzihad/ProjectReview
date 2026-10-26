@@ -7,7 +7,16 @@
 *
 * 🟢 You can import this file directly.
 */
+export const CourseStatus = {
+    DRAFT: 'DRAFT',
+    PUBLISHED: 'PUBLISHED'
+};
 export const Role = {
     STUDENT: 'STUDENT',
     MENTOR: 'MENTOR'
+};
+export const SubmissionStatus = {
+    PENDING: 'PENDING',
+    APPROVED: 'APPROVED',
+    REJECTED: 'REJECTED'
 };

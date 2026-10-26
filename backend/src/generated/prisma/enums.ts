@@ -9,9 +9,26 @@
 * 🟢 You can import this file directly.
 */
 
+export const CourseStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED'
+} as const
+
+export type CourseStatus = (typeof CourseStatus)[keyof typeof CourseStatus]
+
+
 export const Role = {
   STUDENT: 'STUDENT',
   MENTOR: 'MENTOR'
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
+
+
+export const SubmissionStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type SubmissionStatus = (typeof SubmissionStatus)[keyof typeof SubmissionStatus]

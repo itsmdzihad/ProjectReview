@@ -1,0 +1,21 @@
+model Course {
+    id          String       @id @default(uuid())
+    title       String
+    description String       @db.Text
+    coverImage  String?
+    content     String       @db.Text
+    status      CourseStatus @default(DRAFT)
+
+    mentorId String
+    mentor   User   @relation("CourseMentor", fields: [mentorId], references: [id], onDelete: Restrict)
+
+    enrollments Enrollment[]
+    submissions Submission[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([mentorId])
+    @@index([status, createdAt])
+    @@map("courses")
+}

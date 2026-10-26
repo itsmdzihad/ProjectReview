@@ -39,8 +39,10 @@ export const JsonNull = runtime.JsonNull;
  */
 export const AnyNull = runtime.AnyNull;
 export const ModelName = {
-    User: 'User',
-    Post: 'Post'
+    Course: 'Course',
+    Enrollment: 'Enrollment',
+    Submission: 'Submission',
+    User: 'User'
 };
 /*
  * Enums
@@ -51,17 +53,44 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
     RepeatableRead: 'RepeatableRead',
     Serializable: 'Serializable'
 });
-export const UserScalarFieldEnum = {
-    id: 'id',
-    email: 'email',
-    name: 'name'
-};
-export const PostScalarFieldEnum = {
+export const CourseScalarFieldEnum = {
     id: 'id',
     title: 'title',
+    description: 'description',
+    coverImage: 'coverImage',
     content: 'content',
-    published: 'published',
-    authorId: 'authorId'
+    status: 'status',
+    mentorId: 'mentorId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const EnrollmentScalarFieldEnum = {
+    id: 'id',
+    studentId: 'studentId',
+    courseId: 'courseId',
+    createdAt: 'createdAt'
+};
+export const SubmissionScalarFieldEnum = {
+    id: 'id',
+    projectName: 'projectName',
+    repositoryUrl: 'repositoryUrl',
+    liveUrl: 'liveUrl',
+    description: 'description',
+    status: 'status',
+    feedback: 'feedback',
+    studentId: 'studentId',
+    courseId: 'courseId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const UserScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    email: 'email',
+    passwordHash: 'passwordHash',
+    role: 'role',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
 };
 export const SortOrder = {
     asc: 'asc',

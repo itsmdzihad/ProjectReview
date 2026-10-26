@@ -9,17 +9,6 @@ import globalErrorHandler from "./App/middleware/globalErrorHandler.js";
 
 const app: Application = express();
 
-const connect = async () => {
-  try {
-    await prisma.$connect();
-    console.log("Database is connected");
-  } catch (e) {
-    console.log("Database connecting Fail");
-  }
-};
-
-connect();
-
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());

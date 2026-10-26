@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { prisma } from "./App/config/db.config.js";
 import sendRes from "./App/utils/SendRes.js";
+import router from "./App/routes/index.js";
 const app = express();
 const connect = async () => {
     try {
@@ -17,6 +18,7 @@ connect();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use("/api/v1", router);
 app.get("/api/v1/health", (req, res, next) => {
     console.log("hi");
     sendRes({

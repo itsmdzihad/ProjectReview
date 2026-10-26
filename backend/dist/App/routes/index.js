@@ -3,6 +3,7 @@ import authRoute from "../modules/auth/auth.route.js";
 import userRoute from "../modules/user/user.route.js";
 import courseRoute from "../modules/course/course.route.js";
 import enrollmentRoute from "../modules/enrollment/enrollment.route.js";
+import submissionRoute from "../modules/submission/submission.route.js";
 const router = Router();
 const moduleRoutes = [
     {
@@ -20,6 +21,10 @@ const moduleRoutes = [
     {
         path: "/enrollments",
         route: enrollmentRoute,
+    },
+    {
+        path: "/submissions",
+        route: submissionRoute,
     },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

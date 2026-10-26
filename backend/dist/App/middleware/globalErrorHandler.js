@@ -1,22 +1,26 @@
 import httpStatus from "http-status";
-import { capitalizeFirstLetter } from "../utils/SendRes.js";
+import { ZodError } from "zod";
 import config from "../config/index.js";
-const globalErrorHandler = async (err, req, res, next) => {
-    console.log(err);
-    let statusCode = err.statusCode
-        ? err.statusCode
-        : httpStatus.INTERNAL_SERVER_ERROR;
-    let success = false;
+const globalErrorHandler = (err, req, res, next) => {
+    console.error(err);
+    let statusCode = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
     let message = err.message || "Something went wrong!";
     let error = err;
-    if (err.name === "ZodError") {
-        message = capitalizeFirstLetter(message.match(/expected\s+\w+,\s+received\s+\w+/i)[0]);
+    if (err instanceof ZodError) {
+        statusCode = httpStatus.BAD_REQUEST;
+        message = err.issues
+            .map((issue) => {
+            const field = issue.path.join(".");
+            return field ? `${field}: ${issue.message}` : issue.message;
+        })
+            .join(", ");
+        error = err.issues;
     }
     res.status(statusCode).json({
-        success,
+        success: false,
         message,
-        error: config.nodeEnv == "dev" ? error : null,
-        stack: config.nodeEnv === "dev" ? err?.stack : null,
+        error: config.nodeEnv === "dev" ? error : null,
+        stack: config.nodeEnv === "dev" ? err.stack : null,
     });
 };
 export default globalErrorHandler;

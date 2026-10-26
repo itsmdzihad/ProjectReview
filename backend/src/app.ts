@@ -27,8 +27,6 @@ app.use(cookieParser());
 app.use("/api/v1", router);
 
 app.get("/api/v1/health", (req: Request, res: Response, next: NextFunction) => {
-  console.log("hi");
-  throw new AppError(404, "not");
   sendRes({
     res,
     statusCode: 200,

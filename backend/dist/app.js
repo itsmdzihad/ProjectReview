@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import { prisma } from "./App/config/db.config.js";
 import sendRes from "./App/utils/SendRes.js";
 import router from "./App/routes/index.js";
-import AppError from "./App/errors/AppError.js";
 import globalErrorHandler from "./App/middleware/globalErrorHandler.js";
 const app = express();
 const connect = async () => {
@@ -22,8 +21,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/v1", router);
 app.get("/api/v1/health", (req, res, next) => {
-    console.log("hi");
-    throw new AppError(404, "not");
     sendRes({
         res,
         statusCode: 200,

@@ -10,6 +10,8 @@ export type PublishedCourse = {
   coverImage: string | null;
   content: string;
   status: "PUBLISHED";
+  createdAt: string;
+  updatedAt: string;
   mentor: { id: string; name: string };
   _count: { enrollments: number };
 };

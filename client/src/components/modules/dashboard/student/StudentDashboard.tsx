@@ -9,13 +9,13 @@ import { MetricCard, type DashboardMetric } from "./components/MetricCard";
 import { WeeklyActivityCard } from "./components/WeeklyActivityCard";
 
 export function StudentDashboard() {
-  const { enrolledCourseIds } = useStudentEnrollments();
-  const courseCount = enrolledCourseIds.length;
+  const { enrollments, isReady, error } = useStudentEnrollments();
+  const courseCount = enrollments.length;
   const metrics: DashboardMetric[] = [
     {
       label: "Enrolled courses",
-      value: String(courseCount),
-      note: courseCount === 1 ? "1 course ready to continue" : `${courseCount} courses ready to continue`,
+      value: isReady ? String(courseCount) : "—",
+      note: error ?? (courseCount === 1 ? "1 course ready to continue" : `${courseCount} courses ready to continue`),
       icon: BookOpenText,
       tint: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
     },
@@ -50,7 +50,7 @@ export function StudentDashboard() {
           <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Dashboard</h1>
           <p className="mt-2 text-sm text-muted-foreground sm:text-base">A snapshot of your learning progress and what to work on next.</p>
         </div>
-        <Link href="/student/courses/enroll" className="inline-flex h-10 w-fit items-center justify-center gap-2 rounded-full bg-emerald-700 px-5 text-sm font-medium text-white transition-colors hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500">
+        <Link href="/student/courses/catalog" className="inline-flex h-10 w-fit items-center justify-center gap-2 rounded-full bg-emerald-700 px-5 text-sm font-medium text-white transition-colors hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500">
           Explore courses <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
       </header>
@@ -64,7 +64,7 @@ export function StudentDashboard() {
         <LearningSnapshotCard />
       </section>
 
-      <ActiveCourseList enrolledCourseIds={enrolledCourseIds} />
+      <ActiveCourseList enrollments={enrollments} isReady={isReady} error={error} />
     </div>
   );
 }

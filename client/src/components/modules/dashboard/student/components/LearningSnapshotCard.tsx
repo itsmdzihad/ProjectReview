@@ -15,7 +15,7 @@ export function LearningSnapshotCard() {
           <p className="text-sm font-medium text-emerald-100/70">A little progress adds up</p>
           <h2 className="mt-2 max-w-xs text-2xl font-semibold tracking-tight">You’re building a strong learning habit.</h2>
           <p className="mt-3 max-w-sm text-sm leading-6 text-emerald-50/70">You studied on 5 days this week. Keep going with one lesson today.</p>
-          <Link href="/student/courses/enroll" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-emerald-200 transition-colors hover:text-white">
+          <Link href="/student/courses/catalog" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-emerald-200 transition-colors hover:text-white">
             Find your next course <MoveUpRight className="size-4" aria-hidden="true" />
           </Link>
         </div>

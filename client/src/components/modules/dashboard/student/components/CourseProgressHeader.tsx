@@ -27,7 +27,7 @@ export function CourseProgressHeader({
           </span>
           <div>
             <Badge variant="secondary">{course.category}</Badge>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{course.title}</h1>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight [overflow-wrap:anywhere] sm:text-3xl">{course.title}</h1>
           </div>
         </div>
         <div className="min-w-48 sm:text-right">

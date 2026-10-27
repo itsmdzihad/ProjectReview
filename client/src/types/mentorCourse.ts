@@ -7,6 +7,8 @@ export type MentorCourse = {
   level: "Beginner" | "Intermediate";
   duration: string;
   articles: string[];
+  articleSummaries?: string[];
+  outcomes?: string[];
   projectTitle: string;
   projectDescription: string;
   projectDeliverable: string;

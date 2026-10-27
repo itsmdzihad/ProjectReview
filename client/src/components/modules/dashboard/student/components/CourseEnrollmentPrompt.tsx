@@ -15,8 +15,8 @@ export function CourseEnrollmentPrompt({
 
   return (
     <main className="mx-auto w-full max-w-3xl py-8">
-      <Link href="/student/courses/enroll" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" aria-hidden="true" /> Course list
+      <Link href="/student/courses/catalog" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <ArrowLeft className="size-4" aria-hidden="true" /> Course catalog
       </Link>
       <Card className="mt-6 rounded-2xl border-border/70 shadow-none">
         <CardContent className="flex flex-col items-center px-6 py-12 text-center">

@@ -31,6 +31,7 @@ const courseFormSchema = z.object({
     (value) => value.split("\n").some((article) => article.trim().length > 0),
     "Add at least one article title.",
   ),
+  articleSummaries: z.string(),
   projectTitle: z.string().trim().min(3, "Project title must be at least 3 characters."),
   projectDescription: z.string().trim().min(10, "Project description must be at least 10 characters."),
   projectDeliverable: z.string().trim().min(10, "Project deliverable must be at least 10 characters."),
@@ -52,6 +53,7 @@ export function CreateMentorCourseForm({ initialCourse }: { initialCourse?: Ment
       duration: initialCourse?.duration ?? "",
       description: initialCourse?.description ?? "",
       articles: initialCourse?.articles.join("\n") ?? "",
+      articleSummaries: initialCourse?.articleSummaries?.join("\n---\n") ?? "",
       projectTitle: initialCourse?.projectTitle ?? "",
       projectDescription: initialCourse?.projectDescription ?? "",
       projectDeliverable: initialCourse?.projectDeliverable ?? "",
@@ -65,6 +67,11 @@ export function CreateMentorCourseForm({ initialCourse }: { initialCourse?: Ment
           .split("\n")
           .map((article) => article.trim())
           .filter(Boolean);
+        const articleSummaries = value.articleSummaries
+          .split(/\n\s*---\s*\n/)
+          .map((summary) => summary.trim());
+        while (articleSummaries.length < articles.length) articleSummaries.push("");
+        articleSummaries.length = articles.length;
         const title = value.title.trim();
         const description = value.description.trim();
         const category = value.category.trim();
@@ -74,11 +81,8 @@ export function CreateMentorCourseForm({ initialCourse }: { initialCourse?: Ment
         const projectDeliverable = value.projectDeliverable.trim();
         const content = JSON.stringify({
           overview: description,
-          outcomes: articles.map((article) => `Understand and apply ${article.toLowerCase()}`),
           articles,
-          articleSummaries: articles.map(
-            (article) => `${article} introduces an important part of ${title}. Read through the main idea, try the examples from your course materials, and consider how it can help you build the final project.`,
-          ),
+          articleSummaries,
           projectTitle,
           projectDescription,
           projectDeliverable,
@@ -118,6 +122,7 @@ export function CreateMentorCourseForm({ initialCourse }: { initialCourse?: Ment
           level: value.level,
           duration,
           articles,
+          articleSummaries,
           projectTitle,
           projectDescription,
           projectDeliverable,
@@ -247,6 +252,21 @@ export function CreateMentorCourseForm({ initialCourse }: { initialCourse?: Ment
               name={field.name}
               placeholder={"Introduction to the topic\nCore concepts\nPutting the concepts together"}
               rows={6}
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={field.handleChange}
+              error={formatValidationErrors(field.state.meta.errors)}
+            />
+          )}
+        </form.Field>
+        <form.Field name="articleSummaries">
+          {(field) => (
+            <CourseTextareaField
+              label="Article lesson content (optional)"
+              name={field.name}
+              placeholder={"Write the lesson for the first article.\n---\nWrite the lesson for the second article."}
+              rows={8}
+              className="mt-5"
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={field.handleChange}

@@ -1,4 +1,4 @@
-import { BookOpenText, LayoutDashboard } from "lucide-react";
+import { BookOpenText, Compass, LayoutDashboard } from "lucide-react";
 import type { Route } from "@/types";
 
 export const studentRoutes: Route[] = [
@@ -16,9 +16,14 @@ export const studentRoutes: Route[] = [
     title: "Course",
     items: [
       {
-        title: "Enroll Course List",
+        title: "My Enrolled Courses",
         url: "/student/courses/enroll",
         icon: BookOpenText,
+      },
+      {
+        title: "Explore Courses",
+        url: "/student/courses/catalog",
+        icon: Compass,
       },
     ],
   },

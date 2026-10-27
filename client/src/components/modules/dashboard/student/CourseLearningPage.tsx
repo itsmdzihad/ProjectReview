@@ -1,12 +1,14 @@
 "use client";
 
-import { courses } from "@/components/modules/homePage/courseData";
-import { courseContent } from "@/components/modules/courseDetails/courseContent";
+import { useEffect, useState } from "react";
+import { checkEnrollmentAction, getEnrollmentByIdAction } from "@/actions/enrollment.actions";
+import { getCourseByIdAction } from "@/actions/course.actions";
+import type { Course } from "@/components/modules/homePage/types";
+import type { CourseContent } from "@/components/modules/courseDetails/courseContent";
 import { useStudentCourseProgress } from "@/hooks/use-student-course-progress";
 import { useStudentEnrollments } from "@/hooks/use-student-enrollments";
 import { useStudentProjectSubmission } from "@/hooks/use-student-project-submission";
-import { useMentorCourses } from "@/hooks/use-mentor-courses";
-import { toCourseCardData, toCourseContent } from "@/lib/mentor-course-presentation";
+import { parseCourseContent, toPublishedCourseCardData } from "@/lib/mentor-course-presentation";
 import { CourseCompletionCard } from "./components/CourseCompletionCard";
 import { CourseEnrollmentPrompt } from "./components/CourseEnrollmentPrompt";
 import { CourseLessonCard } from "./components/CourseLessonCard";
@@ -14,33 +16,75 @@ import { CourseProgressHeader } from "./components/CourseProgressHeader";
 import { CourseSectionNavigation } from "./components/CourseSectionNavigation";
 
 export function CourseLearningPage({ courseId }: { courseId: string }) {
-  const { mentorCourses, isReady: mentorCoursesReady } = useMentorCourses();
-  const mentorCourse = mentorCourses.find((item) => item.id === courseId);
-  const course = courses.find((item) => item.id === courseId)
-    ?? (mentorCourse ? toCourseCardData(mentorCourse) : undefined);
-  const content = courseContent[courseId]
-    ?? (mentorCourse ? toCourseContent(mentorCourse) : undefined);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [content, setContent] = useState<CourseContent | null>(null);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isLoadingCourse, setIsLoadingCourse] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+  const { enrollCourse } = useStudentEnrollments();
   const totalSteps = (content?.articles.length ?? 0) + 1;
   const { currentStep, isReady: progressReady, goToStep, nextStep } =
     useStudentCourseProgress(courseId, totalSteps);
-  const { enrollCourse, isEnrolled, isReady: enrollmentsReady } =
-    useStudentEnrollments();
   const {
     submission,
     isReady: submissionReady,
     saveSubmission,
   } = useStudentProjectSubmission(courseId);
 
-  if (!progressReady || !enrollmentsReady || !submissionReady || !mentorCoursesReady) {
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      const status = await checkEnrollmentAction(courseId);
+      if (!active) return;
+      if (status.error) {
+        setLoadError(status.error.message);
+        setIsLoadingCourse(false);
+        return;
+      }
+
+      setIsEnrolled(status.data.isEnrolled);
+      if (status.data.isEnrolled && status.data.enrollment) {
+        const enrollment = await getEnrollmentByIdAction(status.data.enrollment.id);
+        if (!active) return;
+        if (enrollment.error) {
+          setLoadError(enrollment.error.message);
+        } else {
+          setCourse(toPublishedCourseCardData(enrollment.data.course));
+          setContent(parseCourseContent(enrollment.data.course.content ?? "", enrollment.data.course.title, enrollment.data.course.description));
+        }
+      } else {
+        const publishedCourse = await getCourseByIdAction(courseId);
+        if (!active) return;
+        if (publishedCourse.error) {
+          setLoadError(publishedCourse.error.message);
+        } else {
+          setCourse(toPublishedCourseCardData(publishedCourse.data));
+          setContent(parseCourseContent(publishedCourse.data.content, publishedCourse.data.title, publishedCourse.data.description));
+        }
+      }
+      setIsLoadingCourse(false);
+    })();
+    return () => { active = false; };
+  }, [courseId, reloadKey]);
+
+  const handleEnroll = async () => {
+    setIsLoadingCourse(true);
+    const success = await enrollCourse(courseId);
+    if (success) setReloadKey((current) => current + 1);
+    else setIsLoadingCourse(false);
+  };
+
+  if (isLoadingCourse || !progressReady || !submissionReady) {
     return <CourseLearningPlaceholder />;
   }
 
-  if (!course || !content) {
-    return <p className="py-10 text-sm text-muted-foreground">This course could not be found.</p>;
+  if (loadError || !course || !content) {
+    return <p className="py-10 text-sm text-destructive" role="alert">{loadError ?? "This course could not be found."}</p>;
   }
 
-  if (!isEnrolled(courseId)) {
-    return <CourseEnrollmentPrompt course={course} onEnroll={() => enrollCourse(course.id)} />;
+  if (!isEnrolled) {
+    return <CourseEnrollmentPrompt course={course} onEnroll={() => void handleEnroll()} />;
   }
 
   const isComplete = submission !== null && currentStep >= totalSteps;
@@ -67,7 +111,6 @@ export function CourseLearningPage({ courseId }: { courseId: string }) {
             />
           ) : (
             <CourseLessonCard
-              course={course}
               content={content}
               currentStep={currentStep}
               isProject={isProject}

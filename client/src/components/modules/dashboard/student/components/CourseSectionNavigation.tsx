@@ -40,7 +40,7 @@ export function CourseSectionNavigation({
                   <span className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full ${isDone ? "bg-emerald-600 text-white" : isCurrent ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground"}`}>
                     {isDone ? <Check className="size-3.5" aria-hidden="true" /> : <Circle className="size-3.5" aria-hidden="true" />}
                   </span>
-                  <span className="text-xs leading-5">{article}</span>
+                  <span className="min-w-0 flex-1 text-xs leading-5 [overflow-wrap:anywhere]">{article}</span>
                 </button>
               </li>
             );
@@ -56,7 +56,7 @@ export function CourseSectionNavigation({
               <span className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full ${isComplete ? "bg-emerald-600 text-white" : isProject ? "text-emerald-700 dark:text-emerald-300" : "text-muted-foreground"}`}>
                 {isComplete ? <Check className="size-3.5" aria-hidden="true" /> : <FolderKanban className="size-3.5" aria-hidden="true" />}
               </span>
-              <span className="text-xs leading-5">{content.projectTitle}</span>
+              <span className="min-w-0 flex-1 text-xs leading-5 [overflow-wrap:anywhere]">{content.projectTitle}</span>
             </button>
           </li>
         </ol>

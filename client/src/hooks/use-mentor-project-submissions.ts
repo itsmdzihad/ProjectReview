@@ -6,11 +6,11 @@ import { getCourseSubmissionsAction, reviewSubmissionAction } from "@/actions/su
 import type { ProjectSubmissionsByCourse, StudentProjectSubmission } from "@/lib/project-submissions";
 import type { ApiProjectSubmission, SubmissionReviewStatus } from "@/services/submission.services";
 
-async function loadSubmissions(courseIdsKey: string) {
+async function loadSubmissions(courseIdsKey: string, status?: "PENDING" | "APPROVED" | "REJECTED") {
   const ids = courseIdsKey ? courseIdsKey.split(",") : [];
   if (ids.length === 0) return { submissions: {} as ProjectSubmissionsByCourse, error: null as string | null };
 
-  const results = await Promise.all(ids.map((courseId) => getCourseSubmissionsAction(courseId, { page: 1, limit: 100 })));
+  const results = await Promise.all(ids.map((courseId) => getCourseSubmissionsAction(courseId, { page: 1, limit: 100, status })));
   const submissions: ProjectSubmissionsByCourse = {};
   let error: string | null = null;
 
@@ -51,30 +51,39 @@ async function loadSubmissions(courseIdsKey: string) {
   return { submissions, error };
 }
 
-export function useMentorProjectSubmissions(courseIds: string[]) {
+export function useMentorProjectSubmissions(
+  courseIds: string[],
+  status?: "PENDING" | "APPROVED" | "REJECTED",
+) {
   const [submissionsByCourse, setSubmissionsByCourse] = useState<ProjectSubmissionsByCourse>({});
-  const [isReady, setIsReady] = useState(false);
+  const [loadedQueryKey, setLoadedQueryKey] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const courseIdsKey = [...new Set(courseIds.filter(Boolean))].sort().join(",");
+  const statusKey = status ?? "ALL";
+  const selectedStatus = statusKey === "ALL" ? undefined : statusKey;
+  const queryKey = `${courseIdsKey}|${statusKey}`;
 
   const refreshSubmissions = useCallback(async () => {
-    setIsReady(false);
-    const result = await loadSubmissions(courseIdsKey);
+    setLoadedQueryKey(null);
+    const result = await loadSubmissions(courseIdsKey, selectedStatus);
     setSubmissionsByCourse(result.submissions);
-    setIsReady(true);
+    setError(result.error);
+    setLoadedQueryKey(queryKey);
     if (result.error) toast.error(result.error);
     return !result.error;
-  }, [courseIdsKey]);
+  }, [courseIdsKey, queryKey, selectedStatus]);
 
   useEffect(() => {
     let active = true;
-    void loadSubmissions(courseIdsKey).then((result) => {
+    void loadSubmissions(courseIdsKey, selectedStatus).then((result) => {
       if (!active) return;
       setSubmissionsByCourse(result.submissions);
-      setIsReady(true);
+      setError(result.error);
+      setLoadedQueryKey(queryKey);
       if (result.error) toast.error(result.error);
     });
     return () => { active = false; };
-  }, [courseIdsKey]);
+  }, [courseIdsKey, queryKey, selectedStatus]);
 
   const reviewSubmission = useCallback(async (
     submissionId: string,
@@ -93,5 +102,11 @@ export function useMentorProjectSubmissions(courseIds: string[]) {
     return true;
   }, [refreshSubmissions]);
 
-  return { submissionsByCourse, isReady, refreshSubmissions, reviewSubmission };
+  return {
+    submissionsByCourse,
+    isReady: loadedQueryKey === queryKey,
+    error: loadedQueryKey === queryKey ? error : null,
+    refreshSubmissions,
+    reviewSubmission,
+  };
 }

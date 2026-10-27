@@ -44,7 +44,7 @@ async function DashboardForUser({
           } as React.CSSProperties
         }
       >
-        <AppSidebar userRole={userRole} variant="inset" />
+        <AppSidebar userRole={userRole} userProfile={{ name: user.name, email: user.email }} variant="inset" />
         <SidebarInset className="min-h-svh bg-muted/20">
           <SiteHeader userRole={userRole} />
           <div className="flex flex-1 flex-col">

@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BookOpenText, CheckCircle2, Clock3, Flame } from "lucide-react";
+import { ArrowRight, BookOpenText, CheckCircle2, Flame, FolderKanban } from "lucide-react";
 import { useStudentEnrollments } from "@/hooks/use-student-enrollments";
+import { useStudentDashboardStats } from "@/hooks/use-student-dashboard-stats";
 import { ActiveCourseList } from "./components/ActiveCourseList";
 import { LearningSnapshotCard } from "./components/LearningSnapshotCard";
 import { MetricCard, type DashboardMetric } from "./components/MetricCard";
@@ -10,6 +11,7 @@ import { WeeklyActivityCard } from "./components/WeeklyActivityCard";
 
 export function StudentDashboard() {
   const { enrollments, isReady, error } = useStudentEnrollments();
+  const stats = useStudentDashboardStats(enrollments, isReady);
   const courseCount = enrollments.length;
   const metrics: DashboardMetric[] = [
     {
@@ -20,23 +22,23 @@ export function StudentDashboard() {
       tint: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
     },
     {
-      label: "Learning hours",
-      value: "18.5",
-      note: "+3.5 hours this week",
-      icon: Clock3,
-      tint: "bg-sky-500/10 text-sky-700 dark:text-sky-300",
-    },
-    {
-      label: "Lessons completed",
-      value: "26",
-      note: "4 completed this week",
+      label: "Learning steps completed",
+      value: stats.isReady ? String(stats.learningStepsCompleted) : "—",
+      note: "Lessons and projects completed",
       icon: CheckCircle2,
       tint: "bg-violet-500/10 text-violet-700 dark:text-violet-300",
     },
     {
+      label: "Projects submitted",
+      value: stats.isReady ? String(stats.submissionCount) : "—",
+      note: "Submitted across your courses",
+      icon: FolderKanban,
+      tint: "bg-sky-500/10 text-sky-700 dark:text-sky-300",
+    },
+    {
       label: "Learning streak",
-      value: "5 days",
-      note: "Keep your momentum going",
+      value: stats.isReady ? `${stats.learningStreak} ${stats.learningStreak === 1 ? "day" : "days"}` : "—",
+      note: `${stats.activeDaysThisWeek} active ${stats.activeDaysThisWeek === 1 ? "day" : "days"} this week`,
       icon: Flame,
       tint: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
     },
@@ -60,11 +62,17 @@ export function StudentDashboard() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(280px,0.85fr)]">
-        <WeeklyActivityCard />
-        <LearningSnapshotCard />
+        <WeeklyActivityCard activity={stats.weeklyActivity} totalSteps={stats.weeklySteps} />
+        <LearningSnapshotCard learningStreak={stats.learningStreak} activeDaysThisWeek={stats.activeDaysThisWeek} />
       </section>
 
-      <ActiveCourseList enrollments={enrollments} isReady={isReady} error={error} />
+      <ActiveCourseList
+        enrollments={enrollments}
+        isReady={isReady}
+        error={error}
+        progressByCourse={stats.progressByCourse}
+        submittedCourseIds={stats.submittedCourseIds}
+      />
     </div>
   );
 }

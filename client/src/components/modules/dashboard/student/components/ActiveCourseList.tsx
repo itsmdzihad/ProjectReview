@@ -5,27 +5,22 @@ import { useTransition } from "react";
 import { ArrowRight, BookOpenText, LogOut } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getCourseMetadata } from "@/lib/mentor-course-presentation";
+import { getCourseMetadata, parseCourseContent } from "@/lib/mentor-course-presentation";
 import { useStudentEnrollments } from "@/hooks/use-student-enrollments";
 import type { StudentEnrollment } from "@/services/enrollment.services";
-
-const courseProgress: Record<string, number> = {
-  "javascript-fundamentals": 68,
-  "html-css": 42,
-  "react-fundamentals": 24,
-  "typescript-essentials": 12,
-  "responsive-web-design": 0,
-  "git-github-basics": 0,
-};
 
 export function ActiveCourseList({
   enrollments,
   isReady,
   error,
+  progressByCourse,
+  submittedCourseIds,
 }: {
   enrollments: StudentEnrollment[];
   isReady: boolean;
   error: string | null;
+  progressByCourse: Record<string, number>;
+  submittedCourseIds: string[];
 }) {
   const { unenrollCourse, refreshEnrollments } = useStudentEnrollments();
   const [isLeaving, startLeaving] = useTransition();
@@ -55,7 +50,16 @@ export function ActiveCourseList({
             <Button variant="outline" className="mt-3 rounded-full" onClick={() => void refreshEnrollments()}>Try again</Button>
           </div>
         ) : enrollments.length > 0 ? enrollments.map((enrollment) => {
-          const progress = courseProgress[enrollment.courseId] ?? 0;
+          const articles = parseCourseContent(
+            enrollment.course.content ?? "",
+            enrollment.course.title,
+            enrollment.course.description,
+          ).articles;
+          const totalSteps = articles.length + 1;
+          const currentStep = submittedCourseIds.includes(enrollment.courseId)
+            ? totalSteps
+            : Math.min(progressByCourse[enrollment.courseId] ?? 0, totalSteps);
+          const progress = totalSteps > 0 ? Math.round((currentStep / totalSteps) * 100) : 0;
           const category = getCourseMetadata(enrollment.course.content ?? "").category ?? "Course";
           return (
             <div key={enrollment.id} className="space-y-2.5 rounded-xl border border-border/70 p-4">

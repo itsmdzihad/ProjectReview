@@ -47,6 +47,7 @@ export function StudentProjectSubmissionCard({
           {isSample && <span className="mt-1 inline-block text-[10px] font-semibold tracking-wide text-amber-700 uppercase dark:text-amber-300">Sample</span>}
         </TableCell>
         <TableCell className="min-w-48 text-muted-foreground">{submission.studentEmail}</TableCell>
+        <TableCell className="min-w-40 text-muted-foreground">{submission.courseTitle ?? "—"}</TableCell>
         <TableCell className="min-w-48 font-medium">{submission.projectName}</TableCell>
         <TableCell className="min-w-32 text-muted-foreground">{new Date(submission.submittedAt).toLocaleDateString()}</TableCell>
         <TableCell className="text-right">
@@ -66,7 +67,7 @@ export function StudentProjectSubmissionCard({
       </TableRow>
       {isExpanded && (
         <TableRow id={detailsId}>
-          <TableCell colSpan={5} className="bg-muted/20 px-5 py-5">
+          <TableCell colSpan={6} className="bg-muted/20 px-5 py-5">
             {submission.status && (
               <p className="mb-3 text-xs font-semibold text-muted-foreground">
                 Status: {submission.status === "PENDING" ? "Pending review" : submission.status === "APPROVED" ? "Approved" : "Changes requested"}

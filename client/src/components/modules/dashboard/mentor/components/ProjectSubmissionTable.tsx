@@ -26,6 +26,7 @@ export function ProjectSubmissionTable({
             <TableRow className="bg-muted/40 hover:bg-muted/40">
               <TableHead>Student</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Course</TableHead>
               <TableHead>Project name</TableHead>
               <TableHead>Submitted</TableHead>
               <TableHead className="text-right">Details</TableHead>
@@ -34,7 +35,7 @@ export function ProjectSubmissionTable({
           <TableBody>
             {submissions.map((submission) => (
               <StudentProjectSubmissionCard
-                key={`${submission.studentId}-${submission.submittedAt}`}
+                key={submission.id ?? `${submission.courseId}-${submission.studentId}-${submission.submittedAt}`}
                 submission={submission}
                 isSample={isSample}
                 onReview={onReview}

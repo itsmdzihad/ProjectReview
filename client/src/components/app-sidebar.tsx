@@ -16,17 +16,17 @@ import {
 import { mentorRoutes } from "@/routes/mentorRoutes";
 import { studentRoutes } from "@/routes/studentRoutes";
 import type { DashboardRole } from "@/types";
+import type { AuthUser } from "@/types";
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   userRole: DashboardRole;
+  userProfile: Pick<AuthUser, "name" | "email">;
 };
 
-export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
+export function AppSidebar({ userRole, userProfile, ...props }: AppSidebarProps) {
   const isStudent = userRole === "student";
   const routes = isStudent ? studentRoutes : mentorRoutes;
-  const user = isStudent
-    ? { name: "Student", email: "student@codepath.dev", avatar: "" }
-    : { name: "Mentor", email: "mentor@codepath.dev", avatar: "" };
+  const user = { ...userProfile, avatar: "" };
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

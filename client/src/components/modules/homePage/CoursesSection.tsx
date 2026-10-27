@@ -1,7 +1,8 @@
 "use client";
 
 import { startTransition, useEffect, useState } from "react";
-import { ArrowUpRight, Code2 } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ArrowUpRight, Code2 } from "lucide-react";
 import { getPublishedCoursesAction } from "@/actions/course.actions";
 import type { PublishedCourse } from "@/services/course.services";
 import { getCourseMetadata } from "@/lib/mentor-course-presentation";
@@ -69,9 +70,14 @@ export function CoursesSection() {
             <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">Explore courses</h2>
             <p className="mt-2 text-sm text-muted-foreground sm:text-base">Start learning with practical, text-based programming courses.</p>
           </div>
-          <a href="#how-it-works" className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-emerald-700 dark:hover:text-emerald-400">
-            How learning works <ArrowUpRight className="size-4" aria-hidden="true" />
-          </a>
+          <div className="flex flex-wrap items-center gap-4">
+            <a href="#how-it-works" className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-emerald-700 dark:hover:text-emerald-400">
+              How learning works <ArrowUpRight className="size-4" aria-hidden="true" />
+            </a>
+            <Link href="/courses" className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border px-4 text-sm font-semibold transition-colors hover:bg-muted">
+              See all courses <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
           {courses.map((course, index) => {

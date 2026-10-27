@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, PlusCircle, RotateCw, Search } from "lucide-react";
+import { PlusCircle, RotateCw, Search } from "lucide-react";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,14 +12,14 @@ import { useMentorCourses } from "@/hooks/use-mentor-courses";
 import type { MentorCourse } from "@/types/mentorCourse";
 import { toast } from "sonner";
 import { MentorCourseCard } from "./MentorCourseCard";
-
-const PAGE_SIZE = 10;
+import { PaginationControls } from "@/components/modules/dashboard/PaginationControls";
 
 export function MentorCourseLibrary() {
   const [mentorCourses, setMentorCourses] = useState<MentorCourse[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,30 +27,30 @@ export function MentorCourseLibrary() {
   const { removeCourse } = useMentorCourses();
 
   const loadCourses = useCallback(async (targetPage: number, search: string) => {
-    const result = await getMyCoursesAction({ page: targetPage, limit: PAGE_SIZE, search });
+    const result = await getMyCoursesAction({ page: targetPage, limit: pageSize, search });
     if (result.error) {
       setError(result.error.message);
     } else {
       setMentorCourses(result.data.map(toMentorCourse));
-      setHasNextPage(result.data.length === PAGE_SIZE);
+      setHasNextPage(result.data.length === pageSize);
     }
     setIsReady(true);
-  }, []);
+  }, [pageSize]);
 
   useEffect(() => {
     let active = true;
-    void getMyCoursesAction({ page, limit: PAGE_SIZE, search: appliedSearch }).then((result) => {
+    void getMyCoursesAction({ page, limit: pageSize, search: appliedSearch }).then((result) => {
       if (!active) return;
       if (result.error) {
         setError(result.error.message);
       } else {
         setMentorCourses(result.data.map(toMentorCourse));
-        setHasNextPage(result.data.length === PAGE_SIZE);
+        setHasNextPage(result.data.length === pageSize);
       }
       setIsReady(true);
     });
     return () => { active = false; };
-  }, [page, appliedSearch]);
+  }, [page, pageSize, appliedSearch]);
 
   const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -138,16 +138,16 @@ export function MentorCourseLibrary() {
         </section>
       )}
 
-      {(page > 1 || hasNextPage) && (
-        <nav aria-label="Course pages" className="flex items-center justify-center gap-3">
-          <Button variant="outline" className="rounded-full" disabled={page === 1 || !isReady} onClick={() => { setIsReady(false); setPage((current) => Math.max(1, current - 1)); }}>
-            <ChevronLeft className="size-4" aria-hidden="true" /> Previous
-          </Button>
-          <span className="text-sm text-muted-foreground">Page {page}</span>
-          <Button variant="outline" className="rounded-full" disabled={!hasNextPage || !isReady} onClick={() => { setIsReady(false); setPage((current) => current + 1); }}>
-            Next <ChevronRight className="size-4" aria-hidden="true" />
-          </Button>
-        </nav>
+      {mentorCourses.length > 0 && (
+        <PaginationControls
+          page={page}
+          pageSize={pageSize}
+          canPrevious={page > 1 && isReady}
+          canNext={hasNextPage && isReady}
+          pageSizeLabel="Courses per page"
+          onPageChange={(nextPage) => { setIsReady(false); setPage(nextPage); }}
+          onPageSizeChange={(nextPageSize) => { setIsReady(false); setPageSize(nextPageSize); setPage(1); }}
+        />
       )}
     </div>
   );

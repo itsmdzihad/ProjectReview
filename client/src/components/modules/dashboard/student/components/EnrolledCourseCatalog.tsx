@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useStudentEnrollments } from "@/hooks/use-student-enrollments";
 import { CourseCard } from "@/components/modules/homePage/CourseCard";
+import { PaginationControls } from "@/components/modules/dashboard/PaginationControls";
 import { toPublishedCourseCardData } from "@/lib/mentor-course-presentation";
 
 export function EnrolledCourseCatalog() {
   const { enrollments, isReady, error } = useStudentEnrollments();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   if (!isReady) {
     return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">{Array.from({ length: 3 }, (_, index) => <div key={index} className="h-[390px] animate-pulse rounded-2xl border border-border/70 bg-card" />)}</div>;
@@ -28,16 +32,34 @@ export function EnrolledCourseCatalog() {
     );
   }
 
+  const totalPages = Math.max(1, Math.ceil(enrollments.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const startIndex = (currentPage - 1) * pageSize;
+  const visibleEnrollments = enrollments.slice(startIndex, startIndex + pageSize);
+
   return (
-    <section aria-label="Your enrolled courses" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-      {enrollments.map((enrollment, index) => (
-        <CourseCard
-          key={enrollment.id}
-          course={toPublishedCourseCardData(enrollment.course)}
-          index={index}
-          detailsHref={`/student/courses/enroll/${enrollment.courseId}`}
-        />
-      ))}
-    </section>
+    <div className="space-y-5">
+      <section aria-label="Your enrolled courses" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+        {visibleEnrollments.map((enrollment, index) => (
+          <CourseCard
+            key={enrollment.id}
+            course={toPublishedCourseCardData(enrollment.course)}
+            index={startIndex + index}
+            detailsHref={`/student/courses/enroll/${enrollment.courseId}`}
+          />
+        ))}
+      </section>
+      <PaginationControls
+        page={currentPage}
+        pageSize={pageSize}
+        canPrevious={currentPage > 1}
+        canNext={currentPage < totalPages}
+        totalItems={enrollments.length}
+        itemLabel="courses"
+        pageSizeLabel="Courses per page"
+        onPageChange={setPage}
+        onPageSizeChange={(nextPageSize) => { setPageSize(nextPageSize); setPage(1); }}
+      />
+    </div>
   );
 }

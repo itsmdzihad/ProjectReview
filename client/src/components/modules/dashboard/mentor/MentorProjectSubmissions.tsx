@@ -15,6 +15,8 @@ import { SubmissionEmptyState } from "./components/SubmissionEmptyState";
 export function MentorProjectSubmissions() {
   const [selectedCourseId, setSelectedCourseId] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState<"ALL" | SubmissionStatus>("ALL");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [mentorCourses, setMentorCourses] = useState<MentorCourse[]>([]);
   const [coursesReady, setCoursesReady] = useState(false);
   const [coursesError, setCoursesError] = useState<string | null>(null);
@@ -71,8 +73,8 @@ export function MentorProjectSubmissions() {
         selectedCourseId={validSelectedCourseId}
         selectedStatus={selectedStatus}
         disabled={isLoading}
-        onSelect={setSelectedCourseId}
-        onStatusSelect={setSelectedStatus}
+        onSelect={(courseId) => { setSelectedCourseId(courseId); setPage(1); }}
+        onStatusSelect={(status) => { setSelectedStatus(status); setPage(1); }}
       />
       {isLoading ? (
         <SubmissionListPlaceholder />
@@ -97,8 +99,12 @@ export function MentorProjectSubmissions() {
         <ProjectSubmissionList
           courseTitle={selectedCourse?.title ?? "All courses"}
           submissions={submissions}
+          page={page}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={(nextPageSize) => { setPageSize(nextPageSize); setPage(1); }}
           onReview={async (id, status, feedback) => {
-            await reviewSubmission(id, status, feedback);
+            if (await reviewSubmission(id, status, feedback)) setPage(1);
           }}
         />
       )}

@@ -7,8 +7,8 @@ export async function createCourseAction(payload: CreateCoursePayload) {
   return courseServices.createCourse(payload);
 }
 
-export async function getPublishedCoursesAction(limit = 6) {
-  return courseServices.getPublishedCourses(limit);
+export async function getPublishedCoursesAction(limit = 6, page = 1) {
+  return courseServices.getPublishedCourses(limit, page);
 }
 
 export async function getCourseByIdAction(id: string) {

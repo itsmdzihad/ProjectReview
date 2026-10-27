@@ -155,10 +155,11 @@ export const courseServices = {
 
   getPublishedCourses: async function (
     limit = 6,
+    page = 1,
   ): Promise<CourseServiceResult<PublishedCourse[]>> {
     try {
       const url = new URL(`${API_URL}/courses`);
-      url.searchParams.set("page", "1");
+      url.searchParams.set("page", String(page));
       url.searchParams.set("limit", String(limit));
 
       const res = await fetch(url.toString(), { cache: "no-store" });

@@ -6,7 +6,7 @@ import type { Course } from "@/components/modules/homePage/types";
 export function CourseHeader({ course }: { course: Course }) {
   return (
     <>
-      <Link href="/#courses" className="mb-6 inline-flex items-center gap-2 rounded-sm text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <Link href="/courses" className="mb-6 inline-flex items-center gap-2 rounded-sm text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
         <ArrowLeft className="size-4" aria-hidden="true" /> All courses
       </Link>
       <header className="mb-8 max-w-4xl sm:mb-10">

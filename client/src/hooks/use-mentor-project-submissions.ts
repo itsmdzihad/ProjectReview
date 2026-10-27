@@ -10,41 +10,45 @@ async function loadSubmissions(courseIdsKey: string, status?: "PENDING" | "APPRO
   const ids = courseIdsKey ? courseIdsKey.split(",") : [];
   if (ids.length === 0) return { submissions: {} as ProjectSubmissionsByCourse, error: null as string | null };
 
-  const results = await Promise.all(ids.map((courseId) => getCourseSubmissionsAction(courseId, { page: 1, limit: 100, status })));
+  const results = await Promise.all(ids.map(async (courseId) => {
+    const courseSubmissions: ApiProjectSubmission[] = [];
+    let page = 1;
+    while (true) {
+      const result = await getCourseSubmissionsAction(courseId, { page, limit: 100, status });
+      if (result.error) return { courseId, data: null, error: result.error.message };
+      if (!Array.isArray(result.data)) return { courseId, data: null, error: "The server returned an invalid submissions list." };
+      courseSubmissions.push(...result.data);
+      if (result.data.length < 100) break;
+      page += 1;
+    }
+    return { courseId, data: courseSubmissions, error: null };
+  }));
   const submissions: ProjectSubmissionsByCourse = {};
   let error: string | null = null;
 
-  results.forEach((result, index) => {
-    if (result.error) {
-      error ??= result.error.message;
-      submissions[ids[index]] = [];
+  results.forEach((result) => {
+    if (result.error || !result.data) {
+      error ??= result.error ?? "Unable to load project submissions.";
+      submissions[result.courseId] = [];
     } else {
-      const records: unknown = result.data;
-      submissions[ids[index]] = Array.isArray(records)
-        ? records.reduce<StudentProjectSubmission[]>((mapped, value: unknown) => {
-            if (!value || typeof value !== "object") return mapped;
-            const submission = value as ApiProjectSubmission;
-            mapped.push({
-              id: submission.id,
-              studentId: submission.student?.id ?? submission.studentId,
-              studentName: submission.student?.name ?? "Student",
-              studentEmail: submission.student?.email ?? "",
-              courseId: submission.courseId,
-              courseTitle: submission.course?.title,
-              projectName: submission.projectName,
-              repoUrl: submission.repositoryUrl,
-              liveLink: submission.liveUrl,
-              description: submission.description,
-              submittedAt: submission.createdAt,
-              status: submission.status,
-              feedback: submission.feedback,
-            });
-            return mapped;
-          }, [])
-        : [];
-      if (!Array.isArray(result.data)) {
-        error ??= "The server returned an invalid submissions list.";
-      }
+      submissions[result.courseId] = result.data.reduce<StudentProjectSubmission[]>((mapped, submission) => {
+        mapped.push({
+          id: submission.id,
+          studentId: submission.student?.id ?? submission.studentId,
+          studentName: submission.student?.name ?? "Student",
+          studentEmail: submission.student?.email ?? "",
+          courseId: submission.courseId,
+          courseTitle: submission.course?.title,
+          projectName: submission.projectName,
+          repoUrl: submission.repositoryUrl,
+          liveLink: submission.liveUrl,
+          description: submission.description,
+          submittedAt: submission.createdAt,
+          status: submission.status,
+          feedback: submission.feedback,
+        });
+        return mapped;
+      }, []);
     }
   });
 

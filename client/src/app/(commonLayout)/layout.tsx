@@ -4,6 +4,7 @@ import { ArrowUpRight, BookOpenText, ChevronDown, Code2 } from "lucide-react";
 import { cache, Suspense } from "react";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 import { userServices } from "@/services/user.services";
+import { SiteNavigationLinks } from "@/components/site-navigation";
 
 const getCurrentUser = cache(async () => {
   const cookieStore = await cookies();
@@ -61,11 +62,7 @@ export default function CommonLayout({ children }: { children: React.ReactNode }
             <span className="text-[17px] font-semibold tracking-tight">CodePath</span>
           </Link>
 
-          <nav aria-label="Main navigation" className="hidden items-center gap-7 md:flex">
-            <Link href="/" className="text-sm font-medium text-foreground">Home</Link>
-            <Link href="/#courses" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Courses</Link>
-            <Link href="/#how-it-works" className="text-sm text-muted-foreground transition-colors hover:text-foreground">About</Link>
-          </nav>
+          <SiteNavigationLinks variant="desktop" />
 
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <button type="button" aria-label="Language: English" className="hidden items-center gap-1.5 rounded-full px-2.5 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:inline-flex">
@@ -76,9 +73,7 @@ export default function CommonLayout({ children }: { children: React.ReactNode }
           </div>
         </div>
         <nav aria-label="Mobile navigation" className="flex items-center justify-center gap-6 border-t border-border/50 px-4 py-2.5 md:hidden">
-          <Link href="/" className="text-xs font-medium text-foreground">Home</Link>
-          <Link href="/#courses" className="text-xs text-muted-foreground">Courses</Link>
-          <Link href="/#how-it-works" className="text-xs text-muted-foreground">About</Link>
+          <SiteNavigationLinks variant="mobile" />
           <Suspense fallback={<div className="h-4 w-16 animate-pulse rounded bg-muted" aria-label="Loading account" />}><MobileAuthLink /></Suspense>
           <ModeToggle />
         </nav>
@@ -94,7 +89,7 @@ export default function CommonLayout({ children }: { children: React.ReactNode }
             <p className="mt-2 max-w-xs text-xs leading-5 text-muted-foreground">A clearer path into code, built for curious minds and hands-on learners.</p>
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-muted-foreground">
-            <Link href="/#courses" className="transition-colors hover:text-foreground">Courses</Link>
+            <Link href="/courses" className="transition-colors hover:text-foreground">Courses</Link>
             <Link href="/#how-it-works" className="transition-colors hover:text-foreground">About</Link>
             <a href="#contact" className="transition-colors hover:text-foreground">Contact</a>
             <span className="basis-full text-muted-foreground/70 md:basis-auto">© 2026 CodePath. Learn, build, repeat.</span>

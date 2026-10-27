@@ -100,5 +100,16 @@ export function useMentorCourses() {
     return course;
   }, []);
 
-  return { mentorCourses, isReady, createCourse, addCourse };
+  const removeCourse = useCallback((courseId: string) => {
+    const nextCourses = readCourses().filter((course) => course.id !== courseId);
+    try {
+      window.localStorage.setItem(MENTOR_COURSES_STORAGE_KEY, JSON.stringify(nextCourses));
+      window.dispatchEvent(new Event(MENTOR_COURSES_CHANGE_EVENT));
+    } catch {
+      // Keep the current screen functional if browser storage is unavailable.
+    }
+    setMentorCourses(nextCourses);
+  }, []);
+
+  return { mentorCourses, isReady, createCourse, addCourse, removeCourse };
 }

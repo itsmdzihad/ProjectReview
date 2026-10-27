@@ -2,6 +2,7 @@ import { Code2 } from "lucide-react";
 import type { Course } from "@/components/modules/homePage/types";
 import type { CourseContent } from "@/components/modules/courseDetails/courseContent";
 import type { MentorCourse } from "@/types/mentorCourse";
+import type { MentorCourseRecord } from "@/services/course.services";
 
 export type CourseMetadata = {
   category?: string;
@@ -23,6 +24,38 @@ export function getCourseMetadata(rawContent: string): CourseMetadata {
   } catch {
     return {};
   }
+}
+
+export function toMentorCourse(course: MentorCourseRecord): MentorCourse {
+  const metadata = getCourseMetadata(course.content);
+  let content: Partial<CourseContent> & CourseMetadata = {};
+  try {
+    const parsed: unknown = JSON.parse(course.content);
+    if (parsed && typeof parsed === "object") content = parsed as typeof content;
+  } catch {
+    // Older courses can store plain text in the content field.
+  }
+
+  const articles = Array.isArray(content.articles)
+    ? content.articles.filter((article): article is string => typeof article === "string")
+    : [];
+  return {
+    id: course.id,
+    title: course.title,
+    description: course.description,
+    category: metadata.category ?? "Course",
+    coverImageUrl: course.coverImage ?? "",
+    level: metadata.level === "Intermediate" ? "Intermediate" : "Beginner",
+    duration: metadata.duration ?? "Self-paced",
+    articles,
+    projectTitle: typeof content.projectTitle === "string" ? content.projectTitle : "Final project",
+    projectDescription: typeof content.projectDescription === "string" ? content.projectDescription : "",
+    projectDeliverable: typeof content.projectDeliverable === "string" ? content.projectDeliverable : "",
+    createdAt: course.createdAt,
+    status: course.status,
+    enrollmentCount: course._count?.enrollments ?? 0,
+    submissionCount: course._count?.submissions ?? 0,
+  };
 }
 
 export function toCourseCardData(course: MentorCourse): Course {

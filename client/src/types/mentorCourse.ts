@@ -11,6 +11,9 @@ export type MentorCourse = {
   projectDescription: string;
   projectDeliverable: string;
   createdAt: string;
+  status?: "DRAFT" | "PUBLISHED";
+  enrollmentCount?: number;
+  submissionCount?: number;
 };
 
 export type NewMentorCourse = Omit<MentorCourse, "id" | "createdAt">;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { MentorCourse } from "@/types/mentorCourse";
 
@@ -23,7 +23,12 @@ export function CreatedCoursesCard({
               <p className="truncate text-sm font-medium">{course.title}</p>
               <p className="mt-1 text-xs text-muted-foreground">{course.articles.length} articles · {course.duration}</p>
             </div>
-            <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">{submissionCounts[course.id] ?? 0} submissions</span>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">{submissionCounts[course.id] ?? 0} submissions</span>
+              <Link href={`/mentor/courses/${course.id}/edit`} className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted" aria-label={`Edit ${course.title}`}>
+                <Pencil className="size-3" aria-hidden="true" /> Edit
+              </Link>
+            </div>
           </div>
         )) : (
           <div className="rounded-xl border border-dashed border-border p-5 text-center">

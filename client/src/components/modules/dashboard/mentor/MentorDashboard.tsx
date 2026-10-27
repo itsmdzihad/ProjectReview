@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { BookOpenText, ClipboardCheck, GraduationCap, UsersRound } from "lucide-react";
 import { courses as builtInCourses } from "@/components/modules/homePage/courseData";
-import { useMentorCourses } from "@/hooks/use-mentor-courses";
+import { getMyCoursesAction } from "@/actions/course.actions";
+import { toMentorCourse } from "@/lib/mentor-course-presentation";
+import type { MentorCourse } from "@/types/mentorCourse";
 import { useMentorProjectSubmissions } from "@/hooks/use-mentor-project-submissions";
 import type { MentorMetric } from "./components/MentorMetricCard";
 import { CreatedCoursesCard } from "./components/CreatedCoursesCard";
@@ -13,7 +16,17 @@ import { RecentSubmissionsCard, type RecentMentorSubmission } from "./components
 const numberFormat = new Intl.NumberFormat();
 
 export function MentorDashboard() {
-  const { mentorCourses, isReady: coursesReady } = useMentorCourses();
+  const [mentorCourses, setMentorCourses] = useState<MentorCourse[]>([]);
+  const [coursesReady, setCoursesReady] = useState(false);
+  useEffect(() => {
+    let active = true;
+    void getMyCoursesAction({ page: 1, limit: 100 }).then((result) => {
+      if (!active) return;
+      if (!result.error) setMentorCourses(result.data.map(toMentorCourse));
+      setCoursesReady(true);
+    });
+    return () => { active = false; };
+  }, []);
   const { submissionsByCourse, isReady: submissionsReady } = useMentorProjectSubmissions();
   const submissions = Object.entries(submissionsByCourse).flatMap(([courseId, entries]) =>
     entries.map((submission) => ({

@@ -1,8 +1,8 @@
-import { ArrowRight, BookOpenText, Clock3, FolderKanban, Layers3 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { BookOpenText, Clock3, FolderKanban, Layers3 } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import type { Course } from "@/components/modules/homePage/types";
 import type { CourseContent } from "../courseContent";
+import { CourseEnrollmentAction } from "./CourseEnrollmentAction";
 
 export function CourseSummaryCard({ course, content }: { course: Course; content: CourseContent }) {
   const CourseIcon = course.icon;
@@ -43,9 +43,7 @@ export function CourseSummaryCard({ course, content }: { course: Course; content
           <p className="mt-4 text-xs leading-5 text-muted-foreground">Learn through focused articles, then demonstrate your skills with a project.</p>
         </CardContent>
         <CardFooter className="flex-col items-stretch gap-3 border-t border-border/70 px-5 py-4">
-          <Button type="button" className="h-10 w-full rounded-full bg-emerald-700 text-white hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500">
-            Enroll Now <ArrowRight className="size-4" aria-hidden="true" />
-          </Button>
+          <CourseEnrollmentAction courseId={course.id} />
           <p className="text-center text-[11px] text-muted-foreground">Self-paced · Learn from anywhere</p>
         </CardFooter>
       </Card>

@@ -1,17 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Mail, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { AuthPageShell } from "./AuthPageShell";
+import { useForm } from "@tanstack/react-form";
+import { toast } from "sonner";
+import * as z from "zod";
+import { useRouter } from "next/navigation";
+import { loginAction } from "@/actions/user.actions";
+import { formatValidationErrors } from "./validation-messages";
+
+const loginSchema = z.object({
+  email: z.email("Enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
+});
 
 const demoAccounts = {
   student: {
     label: "Student",
-    email: "student@codepath.dev",
-    password: "StudentDemo123!",
+    email: "zihad.test@example.com",
+    password: "TestPass123!",
   },
   mentor: {
     label: "Mentor",
@@ -23,14 +34,36 @@ const demoAccounts = {
 type DemoRole = keyof typeof demoAccounts;
 
 export function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [selectedDemo, setSelectedDemo] = useState<DemoRole | null>(null);
+  const router = useRouter();
+
+  const form = useForm({
+    defaultValues: { email: "", password: "" },
+    validators: { onSubmit: loginSchema },
+    onSubmit: ({ value }) => {
+      const toastId = toast.loading("Signing in...");
+      startTransition(async () => {
+        const result = await loginAction(value);
+
+        if (result.error) {
+          toast.error(result.error.message, { id: toastId });
+          return;
+        }
+
+        toast.success("Signed in successfully.", { id: toastId });
+        router.replace(
+          result.data.data.role === "MENTOR"
+            ? "/mentor/dashboard"
+            : "/student/dashboard",
+        );
+      });
+    },
+  });
 
   function fillDemoCredentials(role: DemoRole) {
     const account = demoAccounts[role];
-    setEmail(account.email);
-    setPassword(account.password);
+    form.setFieldValue("email", account.email);
+    form.setFieldValue("password", account.password);
     setSelectedDemo(role);
   }
 
@@ -81,7 +114,14 @@ export function LoginForm() {
             </div>
           </div>
 
-          <form className="space-y-5">
+          <form
+            className="space-y-5"
+            noValidate
+            onSubmit={(event) => {
+              event.preventDefault();
+              void form.handleSubmit();
+            }}
+          >
             <div className="space-y-2">
               <label htmlFor="login-email" className="text-sm font-medium">
                 Email address
@@ -91,21 +131,39 @@ export function LoginForm() {
                   className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
                   aria-hidden="true"
                 />
-                <input
-                  id="login-email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(event) => {
-                    setEmail(event.target.value);
-                    setSelectedDemo(null);
-                  }}
-                  required
-                  className="h-11 w-full rounded-xl border border-input bg-background pr-4 pl-10 text-sm outline-none transition placeholder:text-muted-foreground/70 focus-visible:border-emerald-600 focus-visible:ring-3 focus-visible:ring-emerald-600/15"
-                />
+                <form.Field name="email">
+                  {(field) => (
+                    <input
+                      id="login-email"
+                      name={field.name}
+                      type="email"
+                      autoComplete="email"
+                      placeholder="you@example.com"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) => {
+                        field.handleChange(event.target.value);
+                        setSelectedDemo(null);
+                      }}
+                      aria-invalid={field.state.meta.errors.length > 0}
+                      aria-describedby="login-email-error"
+                      className="h-11 w-full rounded-xl border border-input bg-background pr-4 pl-10 text-sm outline-none transition placeholder:text-muted-foreground/70 focus-visible:border-emerald-600 focus-visible:ring-3 focus-visible:ring-emerald-600/15"
+                    />
+                  )}
+                </form.Field>
               </div>
+              <form.Field name="email">
+                {(field) =>
+                  field.state.meta.errors.length > 0 && (
+                    <p
+                      id="login-email-error"
+                      className="text-xs text-destructive"
+                    >
+                      {formatValidationErrors(field.state.meta.errors)}
+                    </p>
+                  )
+                }
+              </form.Field>
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-3">
@@ -119,20 +177,38 @@ export function LoginForm() {
                   Forgot password?
                 </a>
               </div>
-              <input
-                id="login-password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                  setSelectedDemo(null);
-                }}
-                required
-                className="h-11 w-full rounded-xl border border-input bg-background px-4 text-sm outline-none transition placeholder:text-muted-foreground/70 focus-visible:border-emerald-600 focus-visible:ring-3 focus-visible:ring-emerald-600/15"
-              />
+              <form.Field name="password">
+                {(field) => (
+                  <input
+                    id="login-password"
+                    name={field.name}
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="Enter your password"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => {
+                      field.handleChange(event.target.value);
+                      setSelectedDemo(null);
+                    }}
+                    aria-invalid={field.state.meta.errors.length > 0}
+                    aria-describedby="login-password-error"
+                    className="h-11 w-full rounded-xl border border-input bg-background px-4 text-sm outline-none transition placeholder:text-muted-foreground/70 focus-visible:border-emerald-600 focus-visible:ring-3 focus-visible:ring-emerald-600/15"
+                  />
+                )}
+              </form.Field>
+              <form.Field name="password">
+                {(field) =>
+                  field.state.meta.errors.length > 0 && (
+                    <p
+                      id="login-password-error"
+                      className="text-xs text-destructive"
+                    >
+                      {formatValidationErrors(field.state.meta.errors)}
+                    </p>
+                  )
+                }
+              </form.Field>
             </div>
             <div className="flex items-center gap-2.5">
               <input
@@ -149,7 +225,7 @@ export function LoginForm() {
               </label>
             </div>
             <Button
-              type="button"
+              type="submit"
               className="h-11 w-full rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500"
             >
               Sign in <ArrowRight className="size-4" aria-hidden="true" />

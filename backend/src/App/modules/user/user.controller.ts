@@ -51,8 +51,38 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getStudentDashboardAnalytics = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await userService.getStudentDashboardAnalytics(req.user?.id);
+
+    sendRes({
+      res,
+      success: true,
+      statusCode: 200,
+      message: "Student dashboard analytics retrieved successfully",
+      data: result,
+    });
+  },
+);
+
+const getMentorDashboardAnalytics = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await userService.getMentorDashboardAnalytics(req.user?.id);
+
+    sendRes({
+      res,
+      success: true,
+      statusCode: 200,
+      message: "Mentor dashboard analytics retrieved successfully",
+      data: result,
+    });
+  },
+);
+
 export const userController = {
   getMe,
   getUserById,
   getAllUsers,
+  getStudentDashboardAnalytics,
+  getMentorDashboardAnalytics,
 };

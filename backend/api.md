@@ -97,7 +97,7 @@ Log in with `email` and `password`; both are required. On success, the response 
 
 ## Users
 
-All user routes require authentication. `GET /me` allows students and mentors; the other two routes are mentor-only. Password hashes are omitted from user responses.
+All user routes require authentication. `GET /me` allows students and mentors. Student and mentor dashboard routes are restricted to their matching role; user listing and lookup are mentor-only. Password hashes are omitted from user responses.
 
 ### `GET /api/v1/users/me`
 
@@ -120,6 +120,14 @@ Return the authenticated user's profile.
   }
 }
 ```
+
+### `GET /api/v1/users/dashboard/student`
+
+Student only. Returns enrollment and project submission totals, submission counts by status, the student's submitted course IDs, and daily enrollment/submission activity for the last seven UTC days.
+
+### `GET /api/v1/users/dashboard/mentor`
+
+Mentor only. Returns course totals, enrollment and unique student counts, submission totals by status and course, the five most recent submissions, and daily submission activity for the last seven UTC days.
 
 ### `GET /api/v1/users`
 

@@ -4,9 +4,11 @@ import type {
   LoginPayload,
   LoginResponse,
   LoginResult,
+  AuthUser,
   RegistrationPayload,
   RegistrationResponse,
   RegistrationResult,
+  SessionResult,
 } from "@/types";
 
 const API_URL = env.BACKEND_URL;
@@ -107,7 +109,51 @@ const register = async (
   }
 };
 
+const getSession = async (cookieHeader: string): Promise<SessionResult> => {
+  try {
+    const res = await fetch(`${API_URL}/users/me`, {
+      headers: { Cookie: cookieHeader },
+      cache: "no-store",
+    });
+
+    const result = (await res.json().catch(() => null)) as {
+      success?: boolean;
+      message?: string;
+      data?: AuthUser;
+    } | null;
+
+    if (!res.ok || !result?.success || !result.data) {
+      return {
+        data: null,
+        error: { message: result?.message ?? "Session is missing." },
+      };
+    }
+
+    return { data: result.data, error: null };
+  } catch {
+    return {
+      data: null,
+      error: { message: "Unable to verify the current session." },
+    };
+  }
+};
+
+const logout = async () => {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete("accessToken");
+    return { data: true as const, error: null };
+  } catch {
+    return {
+      data: null,
+      error: { message: "Unable to log out. Please try again." },
+    };
+  }
+};
+
 export const userServices = {
   login,
   register,
+  getSession,
+  logout,
 };

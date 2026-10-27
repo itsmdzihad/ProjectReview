@@ -54,3 +54,7 @@ export type RegistrationResponse = {
 export type RegistrationResult =
   | { data: RegistrationResponse; error: null }
   | { data: null; error: { message: string } };
+
+export type SessionResult =
+  | { data: AuthUser; error: null }
+  | { data: null; error: { message: string } };

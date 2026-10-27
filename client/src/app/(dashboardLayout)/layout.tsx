@@ -1,7 +1,11 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { userServices } from "@/services/user.services";
 import type { DashboardRole } from "@/types";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 function getDashboardForRole(
   userRole: DashboardRole,
@@ -11,14 +15,22 @@ function getDashboardForRole(
   return userRole === "student" ? student : mentor;
 }
 
-export default function DashboardLayout({
+async function DashboardForUser({
   mentor,
   student,
 }: {
   mentor: React.ReactNode;
   student: React.ReactNode;
 }) {
-  const userRole: DashboardRole = "mentor";
+  const cookieStore = await cookies();
+  const { data: user } = await userServices.getSession(cookieStore.toString());
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const userRole: DashboardRole =
+    user.role === "STUDENT" ? "student" : "mentor";
   const activeDashboard = getDashboardForRole(userRole, student, mentor);
 
   return (
@@ -42,5 +54,19 @@ export default function DashboardLayout({
         </SidebarInset>
       </SidebarProvider>
     </div>
+  );
+}
+
+export default function DashboardLayout({
+  mentor,
+  student,
+}: {
+  mentor: React.ReactNode;
+  student: React.ReactNode;
+}) {
+  return (
+    <Suspense fallback={<div className="min-h-svh bg-background" />}>
+      <DashboardForUser mentor={mentor} student={student} />
+    </Suspense>
   );
 }

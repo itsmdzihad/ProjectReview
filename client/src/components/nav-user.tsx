@@ -1,5 +1,8 @@
 "use client"
 
+import { startTransition } from "react"
+import { toast } from "sonner"
+import { logoutAction } from "@/actions/user.actions"
 import {
   Avatar,
   AvatarFallback,
@@ -102,7 +105,17 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                startTransition(async () => {
+                  const result = await logoutAction()
+
+                  if (result.error) {
+                    toast.error(result.error.message)
+                  }
+                })
+              }}
+            >
               <LogOutIcon
               />
               Log out

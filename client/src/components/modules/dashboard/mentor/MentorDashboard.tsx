@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { BookOpenText, ClipboardCheck, GraduationCap, UsersRound } from "lucide-react";
-import { courses as builtInCourses } from "@/components/modules/homePage/courseData";
 import { getMyCoursesAction } from "@/actions/course.actions";
 import { toMentorCourse } from "@/lib/mentor-course-presentation";
 import type { MentorCourse } from "@/types/mentorCourse";
@@ -27,19 +26,17 @@ export function MentorDashboard() {
     });
     return () => { active = false; };
   }, []);
-  const { submissionsByCourse, isReady: submissionsReady } = useMentorProjectSubmissions();
+  const { submissionsByCourse, isReady: submissionsReady } = useMentorProjectSubmissions(mentorCourses.map((course) => course.id));
   const submissions = Object.entries(submissionsByCourse).flatMap(([courseId, entries]) =>
     entries.map((submission) => ({
       ...submission,
       courseId,
-      courseTitle:
-        mentorCourses.find((course) => course.id === courseId)?.title ??
-        builtInCourses.find((course) => course.id === courseId)?.title ??
-        "Course",
+      courseTitle: mentorCourses.find((course) => course.id === courseId)?.title ?? submission.courseTitle ?? "Course",
     })),
   );
   const activeStudentCount = new Set(submissions.map((submission) => submission.studentId)).size;
   const submissionCourseCount = Object.values(submissionsByCourse).filter((items) => items.length > 0).length;
+  const pendingSubmissionCount = submissions.filter((submission) => submission.status === "PENDING").length;
   const metrics: MentorMetric[] = [
     {
       label: "Courses created",
@@ -50,7 +47,7 @@ export function MentorDashboard() {
     },
     {
       label: "Submissions to review",
-      value: submissionsReady ? numberFormat.format(submissions.length) : "—",
+      value: submissionsReady ? numberFormat.format(pendingSubmissionCount) : "—",
       note: `${submissionCourseCount} course${submissionCourseCount === 1 ? "" : "s"} with submissions`,
       icon: ClipboardCheck,
       color: "bg-amber-500/10 text-amber-700 dark:text-amber-300",

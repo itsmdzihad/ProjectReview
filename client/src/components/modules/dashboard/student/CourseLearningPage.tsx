@@ -30,6 +30,7 @@ export function CourseLearningPage({ courseId }: { courseId: string }) {
     submission,
     isReady: submissionReady,
     saveSubmission,
+    removeSubmission,
   } = useStudentProjectSubmission(courseId);
 
   useEffect(() => {
@@ -117,10 +118,12 @@ export function CourseLearningPage({ courseId }: { courseId: string }) {
               onPrevious={() => goToStep(currentStep - 1)}
               onNext={nextStep}
               submission={submission}
-              onSubmitProject={(details) => {
-                saveSubmission(details);
-                goToStep(totalSteps);
+              onSubmitProject={async (details) => {
+                const saved = await saveSubmission(details);
+                if (saved) goToStep(totalSteps);
+                return saved;
               }}
+              onDeleteSubmission={removeSubmission}
             />
           )}
         </section>

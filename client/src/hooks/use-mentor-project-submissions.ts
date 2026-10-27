@@ -1,31 +1,97 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  PROJECT_SUBMISSIONS_CHANGE_EVENT,
-  readProjectSubmissions,
-  type ProjectSubmissionsByCourse,
-} from "@/lib/project-submissions";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { getCourseSubmissionsAction, reviewSubmissionAction } from "@/actions/submission.actions";
+import type { ProjectSubmissionsByCourse, StudentProjectSubmission } from "@/lib/project-submissions";
+import type { ApiProjectSubmission, SubmissionReviewStatus } from "@/services/submission.services";
 
-export function useMentorProjectSubmissions() {
-  const [submissionsByCourse, setSubmissionsByCourse] =
-    useState<ProjectSubmissionsByCourse>({});
+async function loadSubmissions(courseIdsKey: string) {
+  const ids = courseIdsKey ? courseIdsKey.split(",") : [];
+  if (ids.length === 0) return { submissions: {} as ProjectSubmissionsByCourse, error: null as string | null };
+
+  const results = await Promise.all(ids.map((courseId) => getCourseSubmissionsAction(courseId, { page: 1, limit: 100 })));
+  const submissions: ProjectSubmissionsByCourse = {};
+  let error: string | null = null;
+
+  results.forEach((result, index) => {
+    if (result.error) {
+      error ??= result.error.message;
+      submissions[ids[index]] = [];
+    } else {
+      const records: unknown = result.data;
+      submissions[ids[index]] = Array.isArray(records)
+        ? records.reduce<StudentProjectSubmission[]>((mapped, value: unknown) => {
+            if (!value || typeof value !== "object") return mapped;
+            const submission = value as ApiProjectSubmission;
+            mapped.push({
+              id: submission.id,
+              studentId: submission.student?.id ?? submission.studentId,
+              studentName: submission.student?.name ?? "Student",
+              studentEmail: submission.student?.email ?? "",
+              courseId: submission.courseId,
+              courseTitle: submission.course?.title,
+              projectName: submission.projectName,
+              repoUrl: submission.repositoryUrl,
+              liveLink: submission.liveUrl,
+              description: submission.description,
+              submittedAt: submission.createdAt,
+              status: submission.status,
+              feedback: submission.feedback,
+            });
+            return mapped;
+          }, [])
+        : [];
+      if (!Array.isArray(result.data)) {
+        error ??= "The server returned an invalid submissions list.";
+      }
+    }
+  });
+
+  return { submissions, error };
+}
+
+export function useMentorProjectSubmissions(courseIds: string[]) {
+  const [submissionsByCourse, setSubmissionsByCourse] = useState<ProjectSubmissionsByCourse>({});
   const [isReady, setIsReady] = useState(false);
+  const courseIdsKey = [...new Set(courseIds.filter(Boolean))].sort().join(",");
+
+  const refreshSubmissions = useCallback(async () => {
+    setIsReady(false);
+    const result = await loadSubmissions(courseIdsKey);
+    setSubmissionsByCourse(result.submissions);
+    setIsReady(true);
+    if (result.error) toast.error(result.error);
+    return !result.error;
+  }, [courseIdsKey]);
 
   useEffect(() => {
-    const syncSubmissions = () => {
-      setSubmissionsByCourse(readProjectSubmissions());
+    let active = true;
+    void loadSubmissions(courseIdsKey).then((result) => {
+      if (!active) return;
+      setSubmissionsByCourse(result.submissions);
       setIsReady(true);
-    };
-    syncSubmissions();
-    window.addEventListener(PROJECT_SUBMISSIONS_CHANGE_EVENT, syncSubmissions);
-    window.addEventListener("storage", syncSubmissions);
+      if (result.error) toast.error(result.error);
+    });
+    return () => { active = false; };
+  }, [courseIdsKey]);
 
-    return () => {
-      window.removeEventListener(PROJECT_SUBMISSIONS_CHANGE_EVENT, syncSubmissions);
-      window.removeEventListener("storage", syncSubmissions);
-    };
-  }, []);
+  const reviewSubmission = useCallback(async (
+    submissionId: string,
+    status: SubmissionReviewStatus,
+    feedback?: string,
+  ) => {
+    const toastId = toast.loading(status === "APPROVED" ? "Approving project..." : "Sending feedback...");
+    const result = await reviewSubmissionAction(submissionId, { status, feedback });
+    if (result.error) {
+      toast.error(result.error.message, { id: toastId });
+      return false;
+    }
 
-  return { submissionsByCourse, isReady };
+    toast.success(status === "APPROVED" ? "Project approved." : "Project returned with feedback.", { id: toastId });
+    await refreshSubmissions();
+    return true;
+  }, [refreshSubmissions]);
+
+  return { submissionsByCourse, isReady, refreshSubmissions, reviewSubmission };
 }

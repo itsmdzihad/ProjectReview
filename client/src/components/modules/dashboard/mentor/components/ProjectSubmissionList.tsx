@@ -1,12 +1,15 @@
 import { ProjectSubmissionTable } from "./ProjectSubmissionTable";
 import type { StudentProjectSubmission } from "@/lib/project-submissions";
+import type { SubmissionReviewStatus } from "@/services/submission.services";
 
 export function ProjectSubmissionList({
   courseTitle,
   submissions,
+  onReview,
 }: {
   courseTitle: string;
   submissions: StudentProjectSubmission[];
+  onReview: (id: string, status: SubmissionReviewStatus, feedback?: string) => Promise<void>;
 }) {
   const sortedSubmissions = [...submissions].sort((a, b) =>
     b.submittedAt.localeCompare(a.submittedAt),
@@ -25,7 +28,7 @@ export function ProjectSubmissionList({
           {submissions.length} submissions
         </span>
       </div>
-      <ProjectSubmissionTable submissions={sortedSubmissions} />
+      <ProjectSubmissionTable submissions={sortedSubmissions} onReview={onReview} />
     </section>
   );
 }

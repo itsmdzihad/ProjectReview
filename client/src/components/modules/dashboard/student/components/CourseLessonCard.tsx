@@ -18,6 +18,7 @@ export function CourseLessonCard({
   onNext,
   submission,
   onSubmitProject,
+  onDeleteSubmission,
 }: {
   content: CourseContent;
   currentStep: number;
@@ -25,7 +26,8 @@ export function CourseLessonCard({
   onPrevious: () => void;
   onNext: () => void;
   submission: StudentProjectSubmission | null;
-  onSubmitProject: (details: ProjectSubmissionDetails) => void;
+  onSubmitProject: (details: ProjectSubmissionDetails) => Promise<boolean>;
+  onDeleteSubmission: () => Promise<boolean>;
 }) {
   const title = isProject ? content.projectTitle : content.articles[currentStep];
   const StepIcon = isProject ? FolderKanban : BookOpenText;
@@ -52,6 +54,7 @@ export function CourseLessonCard({
             content={content}
             submission={submission}
             onSubmitProject={onSubmitProject}
+            onDeleteSubmission={onDeleteSubmission}
           />
         ) : (
           <ArticleLesson content={content} articleIndex={currentStep} />
@@ -105,10 +108,12 @@ function ProjectLesson({
   content,
   submission,
   onSubmitProject,
+  onDeleteSubmission,
 }: {
   content: CourseContent;
   submission: StudentProjectSubmission | null;
-  onSubmitProject: (details: ProjectSubmissionDetails) => void;
+  onSubmitProject: (details: ProjectSubmissionDetails) => Promise<boolean>;
+  onDeleteSubmission: () => Promise<boolean>;
 }) {
   return (
     <div className="space-y-6">
@@ -117,7 +122,7 @@ function ProjectLesson({
         <p className="text-sm font-semibold">Project outcome</p>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">{content.projectDeliverable}</p>
       </div>
-      <ProjectSubmissionForm submission={submission} onSubmit={onSubmitProject} />
+      <ProjectSubmissionForm submission={submission} onSubmit={onSubmitProject} onDelete={onDeleteSubmission} />
     </div>
   );
 }

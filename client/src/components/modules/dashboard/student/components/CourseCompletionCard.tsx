@@ -23,7 +23,15 @@ export function CourseCompletionCard({
         </span>
         <p className="mt-5 text-xs font-semibold tracking-[0.14em] text-emerald-700 uppercase dark:text-emerald-400">Course completed</p>
         <h2 id="lesson-title" className="mt-2 text-2xl font-semibold tracking-tight">Great work finishing this course.</h2>
-        <p className="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">You’ve submitted your project for {courseTitle}. Review the lessons any time or update your submission below.</p>
+        <p className="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
+          You’ve submitted your project for {courseTitle}. Review the lessons any time
+          {submission.status === "PENDING" ? " or update your submission below." : "."}
+        </p>
+        {submission.status && (
+          <p className="mt-3 rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
+            {submission.status === "PENDING" ? "Awaiting mentor review" : submission.status === "APPROVED" ? "Project approved" : "Mentor requested changes"}
+          </p>
+        )}
         <div className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
           <span className="font-medium">{submission.projectName}</span>
           <a href={submission.repoUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-emerald-800 hover:underline dark:text-emerald-300">
@@ -35,10 +43,18 @@ export function CourseCompletionCard({
             </a>
           )}
         </div>
+        {submission.feedback && (
+          <div className="mt-5 max-w-xl rounded-xl border border-border/70 bg-muted/30 p-4 text-left">
+            <h3 className="text-sm font-semibold">Mentor feedback</h3>
+            <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{submission.feedback}</p>
+          </div>
+        )}
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Button type="button" variant="outline" className="rounded-full" onClick={onEditSubmission}>
-            <Pencil className="size-4" aria-hidden="true" /> Edit project
-          </Button>
+          {(!submission.status || submission.status === "PENDING") && (
+            <Button type="button" variant="outline" className="rounded-full" onClick={onEditSubmission}>
+              <Pencil className="size-4" aria-hidden="true" /> Edit project
+            </Button>
+          )}
           <Button type="button" variant="outline" className="rounded-full" onClick={onReview}>
             <RotateCcw className="size-4" aria-hidden="true" /> Review from start
           </Button>

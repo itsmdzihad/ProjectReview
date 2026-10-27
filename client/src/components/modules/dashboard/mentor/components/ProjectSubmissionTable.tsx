@@ -6,14 +6,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { StudentProjectSubmission } from "@/lib/project-submissions";
+import type { SubmissionReviewStatus } from "@/services/submission.services";
 import { StudentProjectSubmissionCard } from "./StudentProjectSubmissionCard";
 
 export function ProjectSubmissionTable({
   submissions,
   isSample = false,
+  onReview,
 }: {
   submissions: StudentProjectSubmission[];
   isSample?: boolean;
+  onReview?: (id: string, status: SubmissionReviewStatus, feedback?: string) => Promise<void>;
 }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-border/70 bg-card">
@@ -34,6 +37,7 @@ export function ProjectSubmissionTable({
                 key={`${submission.studentId}-${submission.submittedAt}`}
                 submission={submission}
                 isSample={isSample}
+                onReview={onReview}
               />
             ))}
           </TableBody>

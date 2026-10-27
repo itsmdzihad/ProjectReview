@@ -27,7 +27,7 @@ const demoAccounts = {
   mentor: {
     label: "Mentor",
     email: "mentor@codepath.dev",
-    password: "MentorDemo123!",
+    password: "Mentor@12345",
   },
 } as const;
 

@@ -6,12 +6,15 @@ import sendRes from "./App/utils/SendRes.js";
 import router from "./App/routes/index.js";
 import AppError from "./App/errors/AppError.js";
 import globalErrorHandler from "./App/middleware/globalErrorHandler.js";
+import { globalRateLimiter } from "./App/middleware/rateLimiter.js";
 
 const app: Application = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(globalRateLimiter);
+
 app.get("/api/v1/health", (req: Request, res: Response, next: NextFunction) => {
   sendRes({
     res,

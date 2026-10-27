@@ -3,6 +3,28 @@ import type { Course } from "@/components/modules/homePage/types";
 import type { CourseContent } from "@/components/modules/courseDetails/courseContent";
 import type { MentorCourse } from "@/types/mentorCourse";
 
+export type CourseMetadata = {
+  category?: string;
+  level?: string;
+  duration?: string;
+};
+
+export function getCourseMetadata(rawContent: string): CourseMetadata {
+  try {
+    const value: unknown = JSON.parse(rawContent);
+    if (!value || typeof value !== "object") return {};
+
+    const metadata = value as Partial<CourseMetadata>;
+    return {
+      category: typeof metadata.category === "string" ? metadata.category : undefined,
+      level: typeof metadata.level === "string" ? metadata.level : undefined,
+      duration: typeof metadata.duration === "string" ? metadata.duration : undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
 export function toCourseCardData(course: MentorCourse): Course {
   return {
     id: course.id,

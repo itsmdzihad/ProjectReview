@@ -86,5 +86,19 @@ export function useMentorCourses() {
     return created;
   }, []);
 
-  return { mentorCourses, isReady, createCourse };
+  const addCourse = useCallback((course: MentorCourse) => {
+    const nextCourses = [course, ...readCourses().filter((item) => item.id !== course.id)];
+
+    try {
+      window.localStorage.setItem(MENTOR_COURSES_STORAGE_KEY, JSON.stringify(nextCourses));
+      window.dispatchEvent(new Event(MENTOR_COURSES_CHANGE_EVENT));
+    } catch {
+      // Keep the current screen functional if browser storage is unavailable.
+    }
+
+    setMentorCourses(nextCourses);
+    return course;
+  }, []);
+
+  return { mentorCourses, isReady, createCourse, addCourse };
 }

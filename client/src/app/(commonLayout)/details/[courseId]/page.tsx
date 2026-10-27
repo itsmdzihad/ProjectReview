@@ -4,6 +4,7 @@ import { courses } from "@/components/modules/homePage/courseData";
 import { CourseDetailsPage } from "@/components/modules/courseDetails/CourseDetailsPage";
 import { courseContent as builtInCourseContent, type CourseContent } from "@/components/modules/courseDetails/courseContent";
 import { courseServices } from "@/services/course.services";
+import { getCourseMetadata } from "@/lib/mentor-course-presentation";
 import { Code2 } from "lucide-react";
 import type { Course } from "@/components/modules/homePage/types";
 import { CourseDetailsLoading } from "@/components/modules/courseDetails/CourseDetailsLoading";
@@ -40,10 +41,14 @@ async function CourseDetailsRouteContent({ params }: CourseDetailsRouteProps) {
   if (result.error) notFound();
 
   const publishedCourse = result.data;
+  const metadata = getCourseMetadata(publishedCourse.content);
   const course: Course = {
     id: publishedCourse.id,
     title: publishedCourse.title,
     description: publishedCourse.description,
+    category: metadata.category,
+    level: metadata.level,
+    duration: metadata.duration,
     coverImageUrl: publishedCourse.coverImage ?? undefined,
     instructorName: publishedCourse.mentor.name,
     icon: Code2,

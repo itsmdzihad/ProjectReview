@@ -4,6 +4,7 @@ import { startTransition, useEffect, useState } from "react";
 import { ArrowUpRight, Code2 } from "lucide-react";
 import { getPublishedCoursesAction } from "@/actions/course.actions";
 import type { PublishedCourse } from "@/services/course.services";
+import { getCourseMetadata } from "@/lib/mentor-course-presentation";
 import { CourseCard } from "./CourseCard";
 import type { Course } from "./types";
 
@@ -13,10 +14,15 @@ const cardStyle = {
 };
 
 function toCourseCardData(course: PublishedCourse): Course {
+  const metadata = getCourseMetadata(course.content);
+
   return {
     id: course.id,
     title: course.title,
     description: course.description,
+    category: metadata.category,
+    level: metadata.level,
+    duration: metadata.duration,
     coverImageUrl: course.coverImage ?? undefined,
     instructorName: course.mentor?.name,
     icon: Code2,

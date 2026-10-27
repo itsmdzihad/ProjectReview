@@ -10,7 +10,7 @@ import { AuthPageShell } from "./AuthPageShell";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import { formatValidationErrors } from "./validation-messages";
+import { formatValidationErrors } from "@/lib/validation-messages";
 import { registrationAction } from "@/actions/user.actions";
 
 const registrationSchema = z.object({

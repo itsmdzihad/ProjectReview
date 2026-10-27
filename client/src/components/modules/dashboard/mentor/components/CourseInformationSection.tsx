@@ -1,7 +1,6 @@
 import { BookOpenText } from "lucide-react";
-import { CourseInputField, CourseLevelField, CourseTextareaField } from "./CourseFormFields";
 
-export function CourseInformationSection() {
+export function CourseInformationSection({ children }: { children: React.ReactNode }) {
   return (
     <section className="rounded-2xl border border-border/70 bg-card p-5 sm:p-7">
       <div className="mb-6 flex items-center gap-3">
@@ -14,12 +13,7 @@ export function CourseInformationSection() {
         </div>
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
-        <CourseInputField label="Course title" name="title" placeholder="e.g. UI Design Fundamentals" required />
-        <CourseInputField label="Category" name="category" placeholder="e.g. Design" required />
-        <CourseInputField label="Cover image URL" name="coverImageUrl" type="url" placeholder="https://images.example.com/course-cover.jpg" required />
-        <CourseLevelField />
-        <CourseInputField label="Duration" name="duration" placeholder="e.g. 4 weeks" required />
-        <CourseTextareaField label="Course description" name="description" placeholder="What will students learn in this course?" required className="sm:col-span-2" />
+        {children}
       </div>
     </section>
   );

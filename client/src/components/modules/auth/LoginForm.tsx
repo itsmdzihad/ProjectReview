@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { loginAction } from "@/actions/user.actions";
-import { formatValidationErrors } from "./validation-messages";
+import { formatValidationErrors } from "@/lib/validation-messages";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address."),

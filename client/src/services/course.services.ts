@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { env } from "@/types/env";
 
 const API_URL = env.BACKEND_URL;
@@ -23,7 +24,63 @@ type CourseApiResponse<T> = {
   data?: T;
 };
 
+export type CreateCoursePayload = {
+  title: string;
+  description: string;
+  coverImage: string;
+  content: string;
+  status: "PUBLISHED";
+};
+
+export type CreatedCourse = {
+  id: string;
+  title: string;
+  description: string;
+  coverImage: string | null;
+  content: string;
+  status: "DRAFT" | "PUBLISHED";
+  mentorId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export const courseServices = {
+  createCourse: async function (
+    payload: CreateCoursePayload,
+  ): Promise<CourseServiceResult<CreatedCourse>> {
+    try {
+      const cookieStore = await cookies();
+      const res = await fetch(`${API_URL}/courses`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieStore.toString(),
+        },
+        body: JSON.stringify(payload),
+        cache: "no-store",
+      });
+      const result = (await res.json().catch(() => null)) as
+        | CourseApiResponse<CreatedCourse>
+        | null;
+
+      if (!res.ok || !result?.success || !result.data) {
+        return {
+          data: null,
+          error: {
+            message: result?.message ?? "Unable to create the course right now.",
+          },
+        };
+      }
+
+      return { data: result.data, error: null };
+    } catch {
+      return {
+        data: null,
+        error: { message: "Unable to create the course right now." },
+      };
+    }
+  },
+
   getPublishedCourses: async function (
     limit = 6,
   ): Promise<CourseServiceResult<PublishedCourse[]>> {

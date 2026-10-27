@@ -4,10 +4,11 @@ export type Course = {
   id: string;
   title: string;
   description: string;
-  category: string;
-  level: "Beginner" | "Intermediate";
-  duration: string;
+  category?: string;
+  level?: string;
+  duration?: string;
   coverImageUrl?: string;
+  instructorName?: string;
   icon: LucideIcon;
   accent: string;
   graphic: string;

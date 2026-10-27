@@ -6,6 +6,7 @@ import type { DashboardRole } from "@/types";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { DashboardLoading } from "@/components/modules/dashboard/DashboardLoading";
 
 function getDashboardForRole(
   userRole: DashboardRole,
@@ -65,7 +66,7 @@ export default function DashboardLayout({
   student: React.ReactNode;
 }) {
   return (
-    <Suspense fallback={<div className="min-h-svh bg-background" />}>
+    <Suspense fallback={<DashboardLoading />}>
       <DashboardForUser mentor={mentor} student={student} />
     </Suspense>
   );

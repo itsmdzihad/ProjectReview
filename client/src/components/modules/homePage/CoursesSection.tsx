@@ -1,10 +1,59 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
-import { courses } from "./courseData";
+import { startTransition, useEffect, useState } from "react";
+import { ArrowUpRight, Code2 } from "lucide-react";
+import { getPublishedCoursesAction } from "@/actions/course.actions";
+import type { PublishedCourse } from "@/services/course.services";
 import { CourseCard } from "./CourseCard";
+import type { Course } from "./types";
+
+const cardStyle = {
+  accent: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
+  graphic: "from-emerald-100/80 to-teal-50 dark:from-emerald-950 dark:to-teal-950",
+};
+
+function toCourseCardData(course: PublishedCourse): Course {
+  return {
+    id: course.id,
+    title: course.title,
+    description: course.description,
+    coverImageUrl: course.coverImage ?? undefined,
+    instructorName: course.mentor?.name,
+    icon: Code2,
+    ...cardStyle,
+    code: [
+      `// ${course.title}`,
+      `// by ${course.mentor?.name ?? "CodePath mentor"}`,
+      "Start learning...",
+    ],
+  };
+}
 
 export function CoursesSection() {
+  const [courses, setCourses] = useState<PublishedCourse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    startTransition(async () => {
+      const result = await getPublishedCoursesAction();
+      if (!active) return;
+
+      if (result.error) {
+        setLoadError(result.error.message);
+      } else {
+        setCourses(result.data);
+      }
+      setIsLoading(false);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <section id="courses" className="scroll-mt-20 border-y border-border/70 bg-muted/30">
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-16 lg:px-10">
@@ -19,9 +68,23 @@ export function CoursesSection() {
           </a>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-          {courses.map((course, index) => (
-            <CourseCard key={course.title} course={course} index={index} />
+          {courses.map((course, index) => {
+            const cardCourse = toCourseCardData(course);
+            return <CourseCard key={course.id} course={cardCourse} index={index} />;
+          })}
+          {isLoading && Array.from({ length: 3 }, (_, index) => (
+            <div key={index} className="h-[390px] animate-pulse rounded-2xl border border-border/70 bg-card" aria-label="Loading courses" />
           ))}
+          {!isLoading && !loadError && courses.length === 0 && (
+            <p className="col-span-full rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              No published courses are available yet. Please check back soon.
+            </p>
+          )}
+          {!isLoading && loadError && (
+            <p className="col-span-full rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground" role="status">
+              {loadError}
+            </p>
+          )}
         </div>
       </div>
     </section>

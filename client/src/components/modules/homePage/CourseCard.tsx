@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Clock3 } from "lucide-react";
+import { ArrowRight, Clock3, UserRound } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,8 +63,8 @@ export function CourseCard({ course, index, detailsHref = `/details/${course.id}
       </div>
       <CardHeader className="gap-3 px-5 pt-5 pb-2">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">{course.category}</Badge>
-          <Badge variant="outline">{course.level}</Badge>
+          <Badge variant="secondary">{course.category ?? "Published course"}</Badge>
+          {course.level && <Badge variant="outline">{course.level}</Badge>}
         </div>
         <h3 className="text-lg font-semibold tracking-tight">
           <Link href={detailsHref} className="rounded-sm outline-none transition-colors hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-ring dark:hover:text-emerald-400" aria-label={`View ${course.title} course details`}>
@@ -76,9 +76,15 @@ export function CourseCard({ course, index, detailsHref = `/details/${course.id}
         <p className="text-sm leading-6 text-muted-foreground">{course.description}</p>
       </CardContent>
       <CardFooter className="flex items-center justify-between border-t border-border/70 px-5 py-4">
-        <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-          <Clock3 className="size-3.5" aria-hidden="true" /> {course.duration}
-        </span>
+        {course.duration ? (
+          <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Clock3 className="size-3.5" aria-hidden="true" /> {course.duration}
+          </span>
+        ) : course.instructorName ? (
+          <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <UserRound className="size-3.5" aria-hidden="true" /> {course.instructorName}
+          </span>
+        ) : <span />}
         <div className="flex items-center gap-3">
           <Link href={detailsHref} className="text-xs font-semibold text-emerald-700 hover:underline dark:text-emerald-400">Details</Link>
           {enrolled ? (

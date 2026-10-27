@@ -25,11 +25,11 @@ export function CourseSummaryCard({ course, content }: { course: Course; content
           <div className="space-y-3 border-y border-border/70 py-4">
             <div className="flex items-center justify-between gap-3 text-sm">
               <span className="flex items-center gap-2 text-muted-foreground"><Layers3 className="size-4" aria-hidden="true" /> Level</span>
-              <span className="font-medium">{course.level}</span>
+              <span className="font-medium">{course.level ?? "Not specified"}</span>
             </div>
             <div className="flex items-center justify-between gap-3 text-sm">
               <span className="flex items-center gap-2 text-muted-foreground"><Clock3 className="size-4" aria-hidden="true" /> Estimated time</span>
-              <span className="font-medium">{course.duration}</span>
+              <span className="font-medium">{course.duration ?? "Not specified"}</span>
             </div>
             <div className="flex items-center justify-between gap-3 text-sm">
               <span className="flex items-center gap-2 text-muted-foreground"><BookOpenText className="size-4" aria-hidden="true" /> Article lessons</span>

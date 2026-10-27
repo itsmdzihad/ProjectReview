@@ -72,14 +72,14 @@ export default function CommonLayout({ children }: { children: React.ReactNode }
               <span aria-hidden="true">EN</span><ChevronDown className="size-3" aria-hidden="true" />
             </button>
             <div className="hidden sm:block"><ModeToggle /></div>
-            <Suspense fallback={null}><DesktopAuthLinks /></Suspense>
+            <Suspense fallback={<div className="h-9 w-24 animate-pulse rounded-full bg-muted" aria-label="Loading account" />}><DesktopAuthLinks /></Suspense>
           </div>
         </div>
         <nav aria-label="Mobile navigation" className="flex items-center justify-center gap-6 border-t border-border/50 px-4 py-2.5 md:hidden">
           <Link href="/" className="text-xs font-medium text-foreground">Home</Link>
           <Link href="/#courses" className="text-xs text-muted-foreground">Courses</Link>
           <Link href="/#how-it-works" className="text-xs text-muted-foreground">About</Link>
-          <Suspense fallback={null}><MobileAuthLink /></Suspense>
+          <Suspense fallback={<div className="h-4 w-16 animate-pulse rounded bg-muted" aria-label="Loading account" />}><MobileAuthLink /></Suspense>
           <ModeToggle />
         </nav>
       </header>

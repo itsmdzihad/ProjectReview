@@ -11,8 +11,8 @@ export function CourseHeader({ course }: { course: Course }) {
       </Link>
       <header className="mb-8 max-w-4xl sm:mb-10">
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">{course.category}</Badge>
-          <Badge variant="outline">{course.level}</Badge>
+          <Badge variant="secondary">{course.category ?? "Published course"}</Badge>
+          {course.level && <Badge variant="outline">{course.level}</Badge>}
         </div>
         <h1 className="text-3xl leading-tight font-semibold tracking-[-0.04em] sm:text-4xl lg:text-5xl">{course.title}</h1>
         <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{course.description}</p>

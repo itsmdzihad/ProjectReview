@@ -1,45 +1,31 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getMySubmissionsAction } from "@/actions/submission.actions";
-import type { StudentEnrollment } from "@/services/enrollment.services";
+import { getStudentDashboardAnalyticsAction } from "@/actions/user.actions";
+import type { StudentDashboardAnalytics } from "@/services/user.services";
 import {
   readStudentCourseProgress,
-  readStudentLearningActivity,
   STUDENT_COURSE_PROGRESS_EVENT,
 } from "@/hooks/use-student-course-progress";
-import { parseCourseContent } from "@/lib/mentor-course-presentation";
-
-export type DailyActivity = {
-  date: string;
-  day: string;
-  steps: number;
-};
 
 function getDateKey(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
-export function useStudentDashboardStats(enrollments: StudentEnrollment[], enrollmentsReady: boolean) {
+export function useStudentDashboardStats(
+  enrollmentsReady: boolean,
+) {
   const [progressByCourse, setProgressByCourse] = useState<Record<string, number>>({});
-  const [activityByDate, setActivityByDate] = useState<Record<string, number>>({});
-  const [submittedCourseIds, setSubmittedCourseIds] = useState<string[]>([]);
-  const [submissionCount, setSubmissionCount] = useState(0);
-  const [submissionsReady, setSubmissionsReady] = useState(false);
+  const [analytics, setAnalytics] = useState<StudentDashboardAnalytics | null>(null);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    let active = true;
-    const syncProgress = () => {
-      setProgressByCourse(readStudentCourseProgress());
-      setActivityByDate(readStudentLearningActivity());
-    };
+    const syncProgress = () => setProgressByCourse(readStudentCourseProgress());
     window.addEventListener(STUDENT_COURSE_PROGRESS_EVENT, syncProgress);
     window.addEventListener("storage", syncProgress);
-    void Promise.resolve().then(() => {
-      if (active) syncProgress();
-    });
+    syncProgress();
     return () => {
-      active = false;
       window.removeEventListener(STUDENT_COURSE_PROGRESS_EVENT, syncProgress);
       window.removeEventListener("storage", syncProgress);
     };
@@ -48,74 +34,42 @@ export function useStudentDashboardStats(enrollments: StudentEnrollment[], enrol
   useEffect(() => {
     if (!enrollmentsReady) return;
     let active = true;
-    void getMySubmissionsAction({ page: 1, limit: 100 }).then((result) => {
+
+    void getStudentDashboardAnalyticsAction().then((result) => {
       if (!active) return;
-      if (result.error) {
-        setSubmittedCourseIds([]);
-        setSubmissionCount(0);
-      } else {
-        setSubmittedCourseIds(result.data.map((submission) => submission.courseId));
-        setSubmissionCount(result.data.length);
-      }
-      setSubmissionsReady(true);
+      setAnalytics(result.data);
+      setAnalyticsError(result.error?.message ?? null);
+      setIsReady(true);
     });
-    return () => { active = false; };
+
+    return () => {
+      active = false;
+    };
   }, [enrollmentsReady]);
 
-  const weeklyActivity = useMemo<DailyActivity[]>(() => {
+  const weeklyActivity = useMemo(() => {
+    if (analytics) return analytics.weeklyActivity;
+
     const today = new Date();
     return Array.from({ length: 7 }, (_, index) => {
       const date = new Date(today);
       date.setDate(today.getDate() - (6 - index));
-      const dateKey = getDateKey(date);
       return {
-        date: dateKey,
+        date: getDateKey(date),
         day: new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date),
-        steps: activityByDate[dateKey] ?? 0,
+        count: 0,
       };
     });
-  }, [activityByDate]);
-
-  const learningStepsCompleted = useMemo(() => {
-    const submittedIds = new Set(submittedCourseIds);
-    return enrollments.reduce((total, enrollment) => {
-      const articleCount = parseCourseContent(
-        enrollment.course.content ?? "",
-        enrollment.course.title,
-        enrollment.course.description,
-      ).articles.length;
-      const completedArticles = Math.min(progressByCourse[enrollment.courseId] ?? 0, articleCount);
-      const projectSubmitted = submittedIds.has(enrollment.courseId) ? 1 : 0;
-      return total + completedArticles + projectSubmitted;
-    }, 0);
-  }, [enrollments, progressByCourse, submittedCourseIds]);
-
-  const weeklySteps = weeklyActivity.reduce((sum, day) => sum + day.steps, 0);
-  const activeDaysThisWeek = weeklyActivity.filter((day) => day.steps > 0).length;
-
-  const learningStreak = useMemo(() => {
-    const activityDates = new Set(Object.entries(activityByDate).filter(([, steps]) => steps > 0).map(([date]) => date));
-    const today = new Date();
-    const todayKey = getDateKey(today);
-    if (!activityDates.has(todayKey)) today.setDate(today.getDate() - 1);
-
-    let streak = 0;
-    while (activityDates.has(getDateKey(today))) {
-      streak += 1;
-      today.setDate(today.getDate() - 1);
-    }
-    return streak;
-  }, [activityByDate]);
+  }, [analytics]);
 
   return {
+    analytics,
+    analyticsError,
     progressByCourse,
-    submittedCourseIds,
+    submittedCourseIds: analytics?.submittedCourseIds ?? [],
     weeklyActivity,
-    weeklySteps,
-    activeDaysThisWeek,
-    learningStepsCompleted,
-    learningStreak,
-    submissionCount,
-    isReady: submissionsReady,
+    weeklyEvents: weeklyActivity.reduce((sum, day) => sum + day.count, 0),
+    activeDaysThisWeek: analytics?.activeDaysThisWeek ?? 0,
+    isReady,
   };
 }

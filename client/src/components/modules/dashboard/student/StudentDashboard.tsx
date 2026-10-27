@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BookOpenText, CheckCircle2, Flame, FolderKanban } from "lucide-react";
+import { ArrowRight, BookOpenText, CircleCheck, ClipboardClock, FolderKanban } from "lucide-react";
 import { useStudentEnrollments } from "@/hooks/use-student-enrollments";
 import { useStudentDashboardStats } from "@/hooks/use-student-dashboard-stats";
 import { ActiveCourseList } from "./components/ActiveCourseList";
@@ -11,35 +11,36 @@ import { WeeklyActivityCard } from "./components/WeeklyActivityCard";
 
 export function StudentDashboard() {
   const { enrollments, isReady, error } = useStudentEnrollments();
-  const stats = useStudentDashboardStats(enrollments, isReady);
-  const courseCount = enrollments.length;
+  const stats = useStudentDashboardStats(isReady);
+  const courseCount = stats.analytics?.enrolledCoursesCount ?? enrollments.length;
+  const submissionCounts = stats.analytics?.submissionCounts;
   const metrics: DashboardMetric[] = [
     {
       label: "Enrolled courses",
-      value: isReady ? String(courseCount) : "—",
-      note: error ?? (courseCount === 1 ? "1 course ready to continue" : `${courseCount} courses ready to continue`),
+      value: stats.isReady ? String(courseCount) : "—",
+      note: stats.analyticsError ?? error ?? (courseCount === 1 ? "1 course ready to continue" : `${courseCount} courses ready to continue`),
       icon: BookOpenText,
       tint: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
     },
     {
-      label: "Learning steps completed",
-      value: stats.isReady ? String(stats.learningStepsCompleted) : "—",
-      note: "Lessons and projects completed",
-      icon: CheckCircle2,
+      label: "Projects submitted",
+      value: stats.isReady && stats.analytics ? String(stats.analytics.submittedProjectsCount) : "—",
+      note: stats.analyticsError ?? "Across your enrolled courses",
+      icon: FolderKanban,
       tint: "bg-violet-500/10 text-violet-700 dark:text-violet-300",
     },
     {
-      label: "Projects submitted",
-      value: stats.isReady ? String(stats.submissionCount) : "—",
-      note: "Submitted across your courses",
-      icon: FolderKanban,
+      label: "Awaiting review",
+      value: stats.isReady && stats.analytics ? String(submissionCounts?.PENDING ?? 0) : "—",
+      note: stats.analyticsError ?? "Projects with your mentor",
+      icon: ClipboardClock,
       tint: "bg-sky-500/10 text-sky-700 dark:text-sky-300",
     },
     {
-      label: "Learning streak",
-      value: stats.isReady ? `${stats.learningStreak} ${stats.learningStreak === 1 ? "day" : "days"}` : "—",
-      note: `${stats.activeDaysThisWeek} active ${stats.activeDaysThisWeek === 1 ? "day" : "days"} this week`,
-      icon: Flame,
+      label: "Projects approved",
+      value: stats.isReady && stats.analytics ? String(submissionCounts?.APPROVED ?? 0) : "—",
+      note: stats.analyticsError ?? `${submissionCounts?.REJECTED ?? 0} need changes`,
+      icon: CircleCheck,
       tint: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
     },
   ];
@@ -57,13 +58,16 @@ export function StudentDashboard() {
         </Link>
       </header>
 
-      <section aria-label="Learning statistics" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section aria-label="Dashboard analytics" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => <MetricCard key={metric.label} metric={metric} />)}
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(280px,0.85fr)]">
-        <WeeklyActivityCard activity={stats.weeklyActivity} totalSteps={stats.weeklySteps} />
-        <LearningSnapshotCard learningStreak={stats.learningStreak} activeDaysThisWeek={stats.activeDaysThisWeek} />
+        <WeeklyActivityCard activity={stats.weeklyActivity} totalEvents={stats.weeklyEvents} />
+        <LearningSnapshotCard
+          activeDaysThisWeek={stats.activeDaysThisWeek}
+          pendingSubmissions={submissionCounts?.PENDING ?? 0}
+        />
       </section>
 
       <ActiveCourseList

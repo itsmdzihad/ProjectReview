@@ -21,3 +21,11 @@ export async function logoutAction() {
 
   redirect("/");
 }
+
+export async function getStudentDashboardAnalyticsAction() {
+  return userServices.getStudentDashboardAnalytics();
+}
+
+export async function getMentorDashboardAnalyticsAction() {
+  return userServices.getMentorDashboardAnalytics();
+}

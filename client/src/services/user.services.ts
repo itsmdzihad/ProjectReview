@@ -10,8 +10,85 @@ import type {
   RegistrationResult,
   SessionResult,
 } from "@/types";
+import type { ApiProjectSubmission } from "@/services/submission.services";
+import type { MentorCourseRecord } from "@/services/course.services";
 
 const API_URL = env.BACKEND_URL;
+
+export type DashboardActivityDay = {
+  date: string;
+  day: string;
+  count: number;
+};
+
+export type DashboardSubmissionCounts = {
+  PENDING: number;
+  APPROVED: number;
+  REJECTED: number;
+};
+
+export type StudentDashboardAnalytics = {
+  enrolledCoursesCount: number;
+  submittedProjectsCount: number;
+  submittedCourseIds: string[];
+  submissionCounts: DashboardSubmissionCounts;
+  recentSubmissions: ApiProjectSubmission[];
+  weeklyActivity: DashboardActivityDay[];
+  activeDaysThisWeek: number;
+};
+
+export type MentorDashboardAnalytics = {
+  coursesCreatedCount: number;
+  publishedCoursesCount: number;
+  draftCoursesCount: number;
+  totalEnrollmentsCount: number;
+  uniqueStudentsCount: number;
+  totalSubmissionsCount: number;
+  submissionCounts: DashboardSubmissionCounts;
+  submissionCountsByCourse: Record<string, number>;
+  enrollmentCountsByCourse: Record<string, number>;
+  courses: MentorCourseRecord[];
+  recentSubmissions: ApiProjectSubmission[];
+  weeklyActivity: DashboardActivityDay[];
+  activeDaysThisWeek: number;
+};
+
+type DashboardResult<T> =
+  | { data: T; error: null }
+  | { data: null; error: { message: string } };
+
+const getDashboardAnalytics = async <T>(
+  role: "student" | "mentor",
+): Promise<DashboardResult<T>> => {
+  try {
+    const cookieStore = await cookies();
+    const response = await fetch(`${API_URL}/users/dashboard/${role}`, {
+      headers: { Cookie: cookieStore.toString() },
+      cache: "no-store",
+    });
+    const result = (await response.json().catch(() => null)) as {
+      success?: boolean;
+      message?: string;
+      data?: T;
+    } | null;
+
+    if (!response.ok || !result?.success || !result.data) {
+      return {
+        data: null,
+        error: {
+          message: result?.message ?? "Unable to load dashboard analytics.",
+        },
+      };
+    }
+
+    return { data: result.data, error: null };
+  } catch {
+    return {
+      data: null,
+      error: { message: "Unable to load dashboard analytics." },
+    };
+  }
+};
 
 const login = async (payload: LoginPayload): Promise<LoginResult> => {
   try {
@@ -156,4 +233,10 @@ export const userServices = {
   register,
   getSession,
   logout,
+  getStudentDashboardAnalytics() {
+    return getDashboardAnalytics<StudentDashboardAnalytics>("student");
+  },
+  getMentorDashboardAnalytics() {
+    return getDashboardAnalytics<MentorDashboardAnalytics>("mentor");
+  },
 };
